@@ -4,7 +4,6 @@
 #include <atomic>
 #include <cassert>
 #include <cstddef>
-#include <stdexcept>
 
 // spsc
 template <class T, size_t N>
@@ -36,13 +35,13 @@ class LockFreeQueue {
     }
 
     // reader API
-    auto& front() const
+    T* front() const
     {
         auto s = size_.load();
         if (s == 0) {
-            throw std::underflow_error("queue is empty");
+            return nullptr;
         }
-        return buffer_[read_pos_];
+        return buffer_ + read_pos_;
     }
 
     bool pop()

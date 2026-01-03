@@ -23,15 +23,16 @@ class LockFreeQueue {
     auto size() const { return size_.load(); }
 
     // writer thread API
-    auto push(const T& t)
+    bool push(const T& t)
     {
         if (size_.load() >= N) {
-            throw std::overflow_error("queue is full");
+            return false;
         }
         buffer_[write_pos_] = t;
         write_pos_ =
             (write_pos_ + 1) & (N - 1);  // fast and correct is N is a pow2
         size_.fetch_add(1);
+        return true;
     }
 
     // reader API
@@ -44,14 +45,15 @@ class LockFreeQueue {
         return buffer_[read_pos_];
     }
 
-    auto pop()
+    bool pop()
     {
         auto s = size_.load();
         if (s == 0) {
-            throw std::underflow_error("queue is empty");
+            return false;
         }
         read_pos_ = (read_pos_ + 1) & (N - 1);
         size_.fetch_sub(1);
+        return true;
     }
 
    private:

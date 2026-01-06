@@ -1,9 +1,13 @@
 #include <atomic>
 
+// Michael-Scott "Lock-free" MPMC queue
+
 // probably won't be using it in prod bc
 // 1. linked list
 // 2. not wait-free
 // 3. allocates => actually not even lock-free
+
+// might actually be lock-free with some kind of arena allocator
 
 using Data = float;
 

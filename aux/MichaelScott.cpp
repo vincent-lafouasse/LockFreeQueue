@@ -73,7 +73,7 @@ struct Queue {
 
     void enqueue(Data value)
     {
-        Node* node = new Node(Node::Zeroed());
+        Node* node = new Node(Node::Zeroed()); // E1, E3
         node->value = value;  // E2
 
         Pointer tail;

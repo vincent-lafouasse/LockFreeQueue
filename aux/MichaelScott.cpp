@@ -12,6 +12,11 @@ struct Node;
 struct Pointer {
     Node* node;
     unsigned int count;
+
+    bool operator==(const Pointer& other) const
+    {
+        return this->node == other.node && this->count == other.count;
+    }
 };
 
 // atomic as MS requires CAS instructions on it

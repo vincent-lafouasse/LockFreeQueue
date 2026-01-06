@@ -34,13 +34,13 @@ struct AtomicPointer {
     void store(Pointer desired,
                std::memory_order order = std::memory_order_seq_cst) noexcept
     {
-        this->self.store(desired, order);
+        self.store(desired, order);
     }
 
     Pointer load(
         std::memory_order order = std::memory_order_seq_cst) const noexcept
     {
-        return this->self.load(order);
+        return self.load(order);
     }
 
     bool compare_exchange(
@@ -73,8 +73,8 @@ struct Queue {
 
     void enqueue(Data value)
     {
-        Node* node = new Node(Node::Zeroed()); // E1, E3
-        node->value = value;  // E2
+        Node* node = new Node(Node::Zeroed());  // E1, E3
+        node->value = value;                    // E2
 
         Pointer tail;
         Pointer next;

@@ -53,7 +53,7 @@ struct Node {
     Data value;
     AtomicPointer next;
 
-    static Node Dummy() { return {{}, AtomicPointer(nullptr, 0)}; }
+    static Node Zeroed() { return {{}, AtomicPointer(nullptr, 0)}; }
 };
 
 struct Queue {
@@ -62,19 +62,30 @@ struct Queue {
 
     static Queue initialize()
     {
-        Node* dummy = new Node(Node::Dummy());
+        Node* dummy = new Node(Node::Zeroed());
 
         return {{dummy, 0}, {dummy, 0}};
     }
 
     void enqueue(Data value)
     {
-        Node node = Node::Dummy();  // E1, E3 (next is null)
-        node.value = value;         // E2
+        Node* node = new Node(Node::Zeroed());
+        node->value = value;  // E2
 
-        while (1) {  // E4
-            Pointer tail = this->Head.load();
-        }
+        while (1) {                                 // E4
+            Pointer tail = this->Tail.load();       // E5
+            Pointer next = tail.node->next.load();  // E6
+
+            // E7: is another Producer in the middle of a push?
+            if (tail == this->Tail.load()) {
+                // E8: is tail actually the tail ?
+                if (next.node == nullptr) {
+                    // E9: then we good: try to push using CAS
+                    // if (this->Tail.compare_exchange())
+                } else {
+                }
+            }
+        }  // E16
     }
 
     bool dequeue(Data* pvalue);

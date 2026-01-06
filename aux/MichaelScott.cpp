@@ -1,17 +1,32 @@
+#include <atomic>
+
+// probably won't be using it in prod bc
+// 1. linked list
+// 2. not wait-free
+// 3. allocates => actually not even lock-free
+
 using Data = float;
 
 struct Node;
 
+// atomic as MS requires CAS instructions on it
 struct Pointer {
-    Node* node;
-    unsigned int count;
+    struct Inner {
+        Node* node;
+        unsigned int count;
+    };
+
+    std::atomic<Inner> inner;
+    static_assert(std::atomic<Inner>::is_always_lock_free);
+
+    Pointer(Node* p, unsigned int c) : inner(Inner{p, c}) {}
 };
 
 struct Node {
     Data value;
     Pointer next;
 
-    static Node Dummy() { return {{}, {nullptr, 0}}; }
+    static Node Dummy() { return {{}, Pointer(nullptr, 0)}; }
 };
 
 struct Queue {
@@ -22,9 +37,7 @@ struct Queue {
     {
         Node* dummy = new Node(Node::Dummy());
 
-        Pointer head{dummy, 0};
-        Pointer tail{dummy, 0};
-        return {head, tail};
+        return {{dummy, 0}, {dummy, 0}};
     }
 
     void enqueue(Data value);

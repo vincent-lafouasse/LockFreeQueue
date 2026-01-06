@@ -9,29 +9,51 @@ using Data = float;
 
 struct Node;
 
-// atomic as MS requires CAS instructions on it
 struct Pointer {
-    struct Inner {
-        Node* node;
-        unsigned int count;
-    };
+    Node* node;
+    unsigned int count;
+};
 
-    std::atomic<Inner> inner;
-    static_assert(std::atomic<Inner>::is_always_lock_free);
+// atomic as MS requires CAS instructions on it
+struct AtomicPointer {
+    static_assert(std::atomic<Pointer>::is_always_lock_free);
 
-    Pointer(Node* p, unsigned int c) : inner(Inner{p, c}) {}
+    std::atomic<Pointer> self;
+
+    AtomicPointer(Node* p, unsigned int c) : self(Pointer{p, c}) {}
+
+    void store(Pointer desired,
+               std::memory_order order = std::memory_order_seq_cst) noexcept
+    {
+        this->self.store(desired, order);
+    }
+
+    Pointer load(
+        std::memory_order order = std::memory_order_seq_cst) const noexcept
+    {
+        return this->self.load(order);
+    }
+
+    bool compare_exchange(
+        Pointer& expected,
+        Pointer desired,
+        std::memory_order success = std::memory_order_seq_cst,
+        std::memory_order failure = std::memory_order_seq_cst) noexcept
+    {
+        return self.compare_exchange_weak(expected, desired, success, failure);
+    }
 };
 
 struct Node {
     Data value;
-    Pointer next;
+    AtomicPointer next;
 
-    static Node Dummy() { return {{}, Pointer(nullptr, 0)}; }
+    static Node Dummy() { return {{}, AtomicPointer(nullptr, 0)}; }
 };
 
 struct Queue {
-    Pointer Head;
-    Pointer Tail;
+    AtomicPointer Head;
+    AtomicPointer Tail;
 
     static Queue initialize()
     {
@@ -40,6 +62,15 @@ struct Queue {
         return {{dummy, 0}, {dummy, 0}};
     }
 
-    void enqueue(Data value);
+    void enqueue(Data value)
+    {
+        Node node = Node::Dummy();  // E1, E3 (next is null)
+        node.value = value;         // E2
+
+        while (1) {  // E4
+            Pointer tail = this->Head.load();
+        }
+    }
+
     bool dequeue(Data* pvalue);
 };

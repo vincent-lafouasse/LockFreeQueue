@@ -72,20 +72,31 @@ struct Queue {
         Node* node = new Node(Node::Zeroed());
         node->value = value;  // E2
 
-        while (1) {                                 // E4
-            Pointer tail = this->Tail.load();       // E5
-            Pointer next = tail.node->next.load();  // E6
+        Pointer tail;
+        Pointer next;
+
+        while (1) {                         // E4
+            tail = this->Tail.load();       // E5
+            next = tail.node->next.load();  // E6
 
             // E7: is another Producer in the middle of a push?
             if (tail == this->Tail.load()) {
                 // E8: is tail actually the tail ?
                 if (next.node == nullptr) {
                     // E9: then we good: try to push using CAS
-                    // if (this->Tail.compare_exchange())
-                } else {
-                }
-            }
-        }  // E16
+                    bool success = tail.node->next.compare_exchange(
+                        next, {node, next.count + 1});
+                    if (success)
+                        break;  // E9-11
+                } else {        // E12
+                    // E13 tail is not the tail, maybe next is the actual tail
+                    this->Tail.compare_exchange(tail,
+                                                {next.node, tail.count + 1});
+                }  // E14 endif
+            }      // E15 endif
+        }          // E16 endloop
+        // E17 enqueue is done, update Tail
+        this->Tail.compare_exchange(tail, {node, tail.count + 1});
     }
 
     bool dequeue(Data* pvalue);

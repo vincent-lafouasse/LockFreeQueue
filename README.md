@@ -1,3 +1,3 @@
 # LockFreeQueue
 
-A study in wait-free data structures
+A review on wait-free data structures

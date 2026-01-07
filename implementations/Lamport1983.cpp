@@ -55,12 +55,14 @@ static std::atomic<size_t> Tail{0};
 // assumes single producer
 void put(Data value)
 {
-    // sole owner, relaxed is fine
+    // sole owner, no risk of missing a write to Tail
+    // `relaxed` is perfect
     const size_t tail = Tail.load(std::memory_order_relaxed);
 
     // acquire because we want the latest Head value
     while (tail - Head.load(std::memory_order_acquire) == Size) {
-        // spin while waiting for there to be space ??
+        // spin while waiting for there to be space
+        // could return bool instead for a non-spinning/non-blocking version
     }
 
     Q[tail & (Size - 1)] = value;
@@ -70,19 +72,15 @@ void put(Data value)
 }
 
 // assume single consumer
+// every comment in `put` is applicable here, it's completely symmetric
 Data get()
 {
-    // sole owner, relaxed is fine
     const size_t head = Head.load(std::memory_order_relaxed);
 
-    // acquire because we want the latest Tail value
     while (head == Tail.load(std::memory_order_acquire)) {
-        // spin while waiting for there to be anything in there ??
     }
 
     const Data out = Q[head & (Size - 1)];
-    // no mod, the Lamport head and tail go off into infinity
-    // `release` publishes the result to the producer thread
     Head.store(head + 1, std::memory_order_release);
     return out;
 }

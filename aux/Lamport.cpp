@@ -5,7 +5,7 @@
 namespace Lamport {
 using Data = float;
 
-constexpr size_t Size = 1024;  // number of elements
+constexpr size_t Size = 1024;
 
 static std::array<Data, Size> Q{};
 

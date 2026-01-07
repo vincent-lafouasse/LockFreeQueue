@@ -48,9 +48,10 @@ constexpr size_t Size = 1024;
 
 static std::array<Data, Size> Q{};
 
-// those should probably be on their own cache lines to avoid false sharing
-static std::atomic<size_t> Head{0};
-static std::atomic<size_t> Tail{0};
+// aligned as for each to be on its own cache line
+// avoid false sharing
+alignas(128) static std::atomic<size_t> Head{0};
+alignas(128) static std::atomic<size_t> Tail{0};
 
 // assumes single producer
 void put(Data value)

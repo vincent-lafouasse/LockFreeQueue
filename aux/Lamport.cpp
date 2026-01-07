@@ -9,6 +9,7 @@ constexpr size_t Size = 1024;  // number of elements
 
 static std::array<Data, Size> Q{};
 
+// those should probably be on their own cache lines to avoid false sharing
 static std::atomic<size_t> Head{0};
 static std::atomic<size_t> Tail{0};
 

@@ -10,9 +10,7 @@
 // ## couple of changes from the pseudo-code
 //
 // - Lamport assumed complete sequential consistency and uses atomic registers
-// (hence the shift based access instead of random access).
-//
-// - Sequential consistency is hard to expect from a weak memory order system so
+// Sequential consistency is hard to expect from a weak memory order system so
 // Head and Tail needed to be made atomic. I tried to match the semantics of the
 // operations to C/C++ memory orders semantics
 //

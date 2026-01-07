@@ -24,7 +24,7 @@ void put(Data value)
 
     Q[tail & (Size - 1)] = value;
     // no mod, the Lamport head and tail go off into infinity
-    Tail.fetch_add(1, std::memory_order_release);
+    Tail.store(tail + 1, std::memory_order_release);
 }
 
 // assume single consumer
@@ -38,7 +38,7 @@ Data get()
 
     const Data out = Q[head & (Size - 1)];
     // no mod, the Lamport head and tail go off into infinity
-    Head.fetch_add(1, std::memory_order_release);
+    Head.store(head + 1, std::memory_order_release);
     return out;
 }
 }  // namespace Lamport

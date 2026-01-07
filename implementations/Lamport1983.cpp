@@ -5,6 +5,31 @@
 // remarkably elegant and symmetric
 // but the consumer thread probably shouldn't have access to he write end
 // even if read-only => see Giacomoni2008
+// the indices could be private instead of shared
+
+// ## couple of changes from the pseudo-code
+//
+// - Lamport assumed complete sequential consistency and uses atomic registers
+// (hence the shift based access instead of random access).
+//
+// - Sequential consistency is hard to expect from a weak memory order system so
+// Head and Tail needed to be made atomic. I tried to match the semantics of the
+// operations to C/C++ memory orders semantics
+//
+// - Lamport uses modulus, I fixed Size to a power of 2 to use bitwise AND instead.
+// we gain a lot and lose nothing from having a power of 2 buffer size so i went for that
+// (also makes it more usable in audio where buffer and fft sizes are almost always powers of 2)
+//
+// ## weird stuff that i let in:
+//
+// - the `skip` loop while empty/full
+// this is an extremely busy wait that should probably be replaced by some kind
+// of error value, e.g. `bool put(Data)` and `bool get(Data*)`
+//
+// - the Head and Tail indices never wrapped explicitely and going off into
+// infinity this looks funny but the power of 2 Size should make Head and Tail
+// overflow gracefully (since unlike signed overflow, unsigned overflow is
+// perfectly standard and guaranteed)
 
 namespace Lamport {
 using Data = float;

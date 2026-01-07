@@ -2,6 +2,10 @@
 #include <atomic>
 #include <cstddef>
 
+// remarkably elegant and symmetric
+// but the consumer thread probably shouldn't have access to he write end
+// even if read-only => see Giacomoni2008
+
 namespace Lamport {
 using Data = float;
 

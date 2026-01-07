@@ -15,7 +15,7 @@
 //
 // Sequential consistency is hard to expect from a weak memory order system so I
 // tried to match the semantics of the operations to C/C++ memory orders
-// semantics
+// semantics. But maybe i should have put `memory_seq_cst` for everybody instead.
 //
 // - Lamport uses modulus, I fixed Size to a power of 2 to use bitwise AND
 // instead. we gain a lot and lose nothing from having a power of 2 buffer size

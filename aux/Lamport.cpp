@@ -16,28 +16,34 @@ static std::atomic<size_t> Tail{0};
 // assumes single producer
 void put(Data value)
 {
-    const size_t tail = Tail.load(std::memory_order_acquire);
+    // sole owner, relaxed is fine
+    const size_t tail = Tail.load(std::memory_order_relaxed);
 
-    // spin while waiting for there to be space ??
+    // acquire because we want the latest Head value
     while (tail - Head.load(std::memory_order_acquire) == Size) {
+        // spin while waiting for there to be space ??
     }
 
     Q[tail & (Size - 1)] = value;
     // no mod, the Lamport head and tail go off into infinity
+    // `release` publishes the result to the consumer thread
     Tail.store(tail + 1, std::memory_order_release);
 }
 
 // assume single consumer
 Data get()
 {
-    const size_t head = Head.load(std::memory_order_acquire);
+    // sole owner, relaxed is fine
+    const size_t head = Head.load(std::memory_order_relaxed);
 
-    // spin while waiting for there to be anything in there ??
+    // acquire because we want the latest Tail value
     while (head == Tail.load(std::memory_order_acquire)) {
+        // spin while waiting for there to be anything in there ??
     }
 
     const Data out = Q[head & (Size - 1)];
     // no mod, the Lamport head and tail go off into infinity
+    // `release` publishes the result to the producer thread
     Head.store(head + 1, std::memory_order_release);
     return out;
 }

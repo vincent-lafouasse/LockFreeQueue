@@ -15,8 +15,9 @@
 //
 // Sequential consistency is hard to expect from a weak memory order system so I
 // tried to match the semantics of the operations to C/C++ memory orders
-// semantics. But maybe i should have put `memory_seq_cst` for everybody instead
-// since it's actually an optimization
+// semantics. But maybe i should have put `memory_seq_cst` for everybody to stay
+// in the spirit of a Lamport queue since using relaxed and acquire/release is
+// actually an optimization
 //
 // - Lamport uses modulus, I fixed Size to a power of 2 to use bitwise AND
 // instead. we gain a lot and lose nothing from having a power of 2 buffer size

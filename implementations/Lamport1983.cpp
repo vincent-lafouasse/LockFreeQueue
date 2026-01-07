@@ -25,9 +25,13 @@
 // of error value, e.g. `bool put(Data)` and `bool get(Data*)`
 //
 // - the Head and Tail indices never wrapped explicitely and going off into
-// infinity this looks funny but the power of 2 Size should make Head and Tail
+// infinity
+//
+// this looks funny but the power of 2 Size should make Head and Tail
 // overflow gracefully (since unlike signed overflow, unsigned overflow is
 // perfectly standard and guaranteed)
+//
+// also we will probably never overflow the underlying u64, let's be honest
 
 namespace Lamport {
 using Data = float;

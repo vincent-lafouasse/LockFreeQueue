@@ -7,6 +7,8 @@
 // 2. not wait-free
 // 3. allocates => actually not even lock-free
 
+// still remarkable for there to be a safe MPMC queue in 94
+
 // might actually be lock-free with some kind of arena allocator
 
 using Data = float;

@@ -9,20 +9,28 @@
 
 // ## couple of changes from the pseudo-code
 //
-// - Lamport assumed complete sequential consistency and uses atomic registers
-// Sequential consistency is hard to expect from a weak memory order system so
-// Head and Tail needed to be made atomic. I tried to match the semantics of the
-// operations to C/C++ memory orders semantics
+// - Lamport assumed complete sequential consistency, uses atomic registers and
+// directly assigns them without mention memory fences (everything is
+// implicitely seq_cst) so Head and Tail were made atomic<size_t>
 //
-// - Lamport uses modulus, I fixed Size to a power of 2 to use bitwise AND instead.
-// we gain a lot and lose nothing from having a power of 2 buffer size so i went for that
-// (also makes it more usable in audio where buffer and fft sizes are almost always powers of 2)
+// Sequential consistency is hard to expect from a weak memory order system so I
+// tried to match the semantics of the operations to C/C++ memory orders
+// semantics
+//
+// - Lamport uses modulus, I fixed Size to a power of 2 to use bitwise AND
+// instead. we gain a lot and lose nothing from having a power of 2 buffer size
+// so i went for that (also makes it more usable in audio where buffer and fft
+// sizes are almost always powers of 2)
 //
 // ## weird stuff that i let in:
 //
 // - the `skip` loop while empty/full
+//
 // this is an extremely busy wait that should probably be replaced by some kind
 // of error value, e.g. `bool put(Data)` and `bool get(Data*)`
+//
+// i guess this is fine for HFT where you need to snag a trade as soon as
+// it's available but that's neither my interest nor my usecase
 //
 // - the Head and Tail indices never wrapped explicitely and going off into
 // infinity

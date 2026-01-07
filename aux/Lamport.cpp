@@ -22,9 +22,9 @@ void put(Data value)
     while (tail - Head.load(std::memory_order_acquire) == Size) {
     }
 
-    Q[tail] = value;
-    const size_t new_tail = (tail + 1) % Size;
-    Tail.store(new_tail, std::memory_order_release);
+    Q[tail & (Size - 1)] = value;
+    // no mod, the Lamport head and tail go off into infinity
+    Tail.fetch_add(1, std::memory_order_release);
 }
 
 // assume single consumer
@@ -36,9 +36,9 @@ Data get()
     while (head == Tail.load(std::memory_order_acquire)) {
     }
 
-    const Data out = Q[head];
-    const size_t new_head = (head + 1) % Size;
-    Head.store(new_head, std::memory_order_release);
+    const Data out = Q[head & (Size - 1)];
+    // no mod, the Lamport head and tail go off into infinity
+    Head.fetch_add(1, std::memory_order_release);
     return out;
 }
 }  // namespace Lamport

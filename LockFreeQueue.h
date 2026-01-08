@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdatomic.h>
+#include <stdbool.h>
 #include <stddef.h>
 
 // prevents false sharing on M-series CPU
@@ -39,3 +40,6 @@ struct LockFreeQueueProducer {
 LockFreeQueue clfq_new(void);
 
 LockFreeQueueProducer clfq_producer(LockFreeQueue* clfq);
+
+// no partial transactions
+bool clfq_push(LockFreeQueueProducer* producer, const float* elems, size_t n);

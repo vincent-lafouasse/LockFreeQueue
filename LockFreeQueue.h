@@ -9,7 +9,6 @@
 // meant for batch use (audio) rather than elementwise processing
 
 #include <stdalign.h>
-#include <stdatomic.h>
 #include <stdbool.h>
 #include <stddef.h>
 

@@ -250,6 +250,8 @@ def format_entry(entry) -> str:
     elif etype == "inproceedings":
         # Using series as an optional bonus if present, otherwise booktitle only
         venue = get_field(entry, "booktitle").replace("Proceedings of the", "Proc.")
+        if not venue.startswith("Proc."):
+            venue = f"Proc. {venue}"
         series = entry.get("series")
         venue_str = f"{venue} ({series})" if series else venue
         pages = (

@@ -37,7 +37,9 @@ typedef struct LockFreeQueue LockFreeQueue;
 struct LockFreeQueue {
     // avoid false sharing
     alignas(CACHE_LINE) _Atomic(size_t) front;
+    char pad1[CACHE_LINE - sizeof(_Atomic(size_t))];
     alignas(CACHE_LINE) _Atomic(size_t) back;
+    char pad2[CACHE_LINE - sizeof(_Atomic(size_t))];
     alignas(CACHE_LINE) float data[CLF_QUEUE_SIZE];
 };
 

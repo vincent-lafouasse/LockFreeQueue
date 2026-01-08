@@ -60,6 +60,10 @@ class Author:
 
 class Reference:
     def __init__(self, entry):
+        self.mnemonic = entry.get("ID")
+        self.ref_type = entry.get("ENTRYTYPE")
+        self.year = entry.get("year")
+
         self.set_title(entry.get("title", None))
         self.authors = Reference.parse_authors(entry.get("author", ""))
 
@@ -81,10 +85,12 @@ class Reference:
         return f"{authors} {self.title}"
 
     def log(self):
-        print(f"Title:\n    {self.title}")
-        print(f"Authors:")
+        print(f"{self.mnemonic} ({self.ref_type}) {{")
+        print(f"    Title:")
+        print(f"        {self.title}")
+        print(f"    Authors:")
         for author in self.authors:
-            print(f"    {author}")
+            print(f"        {author}")
         print()
 
 

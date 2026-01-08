@@ -7,6 +7,14 @@
 // ring buffer principles established by Leslie Lamport (1983).
 //
 // meant for batch use (audio) rather than elementwise processing
+//
+// this is a Single Producer Single Consumer concurrent queue, so
+// - Each LockFreeQueue supports exactly one producer thread and one consumer
+// thread.
+// - A LockFreeQueueProducer must be used by exactly one thread.
+// - A LockFreeQueueConsumer must be used by exactly one thread.
+// - Copying producer or consumer handles, or using them concurrently from
+// multiple threads, results in undefined behavior.
 
 #include <stdalign.h>
 #include <stdbool.h>
@@ -85,8 +93,13 @@ size_t clfq_pop_partial(LockFreeQueueConsumer* restrict consumer,
                         float* restrict elems,
                         size_t n);
 
+// peek returns a pointer to a contiguous slice of unread elements.
+// The returned pointer remains valid until the next call that advances the
+// consumer position (pop or skip). The producer will not overwrite peeked data
+// until the consumer advances the front index.
+//
 // peek operations will always return a smaller size than consumer_size() as it
-// has to guarantee a contiguous slice
+// has to guarantee a contiguous slice and so does not cross the buffer boundary
 
 // Returns size of contiguous slice available using cached_back
 size_t clfq_consumer_peek_lazy(const LockFreeQueueConsumer* consumer,
@@ -97,5 +110,5 @@ size_t clfq_consumer_peek_eager(LockFreeQueueConsumer* consumer,
                                 const float** ptr);
 
 // unsafe, will cross the write end if not careful
-// meant to be called after peek
+// meant to be called after peek to consume data that we know is there
 void clfq_consumer_skip(LockFreeQueueConsumer* consumer, size_t n);

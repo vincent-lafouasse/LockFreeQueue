@@ -16,7 +16,7 @@ TYPE_SPECIFIC_REQUIRED = {
         "journal",
         "volume",
         "pages",
-        "number", # issue
+        "number",  # issue
         "month",
         "doi",
     },

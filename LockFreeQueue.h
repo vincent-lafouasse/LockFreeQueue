@@ -53,7 +53,7 @@ LockFreeQueueProducer clfq_producer(LockFreeQueue* clfq);
 // there might be more available
 size_t clfq_producer_size_lazy(const LockFreeQueueProducer* producer);
 
-// loads `front and updates `cached_front`
+// loads `front` and updates `cached_front`
 size_t clfq_producer_size_eager(LockFreeQueueProducer* producer);
 
 // no partial transactions

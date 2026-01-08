@@ -19,14 +19,11 @@ _Static_assert(((CLF_QUEUE_SIZE & (CLF_QUEUE_SIZE - 1)) == 0),
 typedef struct LockFreeQueue LockFreeQueue;
 struct LockFreeQueue {
     // Consumer state, on a different cache line from Producer state
+    // won't be invalidated by Producer thread
     _Alignas(CACHE_LINE) _Atomic size_t front;  // shared (S)
-    // private to Consumer, won't be invalidated by Producer thread
-    size_t cached_back;  // shared, not exclusive (E), didn't want to waste more
-                         // memory
 
     // Producer state
     _Alignas(CACHE_LINE) _Atomic size_t back;
-    size_t cached_front;
 
     _Alignas(CACHE_LINE) float data[CLF_QUEUE_SIZE];
 };
@@ -35,7 +32,7 @@ typedef struct LockFreeQueueProducer LockFreeQueueProducer;
 struct LockFreeQueueProducer {
     _Atomic size_t* back;         // sole writer
     const _Atomic size_t* front;  // read only
-    size_t* cached_front;
+    size_t cached_front;          // avoid pessimistic loads
     float* data;
 };
 

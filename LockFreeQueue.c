@@ -7,8 +7,6 @@ LockFreeQueue clfq_new(void)
 
     atomic_init(&out.front, 0);
     atomic_init(&out.back, 0);
-    out.cached_front = 0;
-    out.cached_back = 0;
     return out;
 }
 
@@ -16,7 +14,7 @@ LockFreeQueueProducer clfq_producer(LockFreeQueue* clfq)
 {
     return (LockFreeQueueProducer){.back = &clfq->back,
                                    .front = &clfq->front,
-                                   .cached_front = &clfq->cached_front,
+                                   .cached_front = 0,
                                    .data = clfq->data};
 }
 

@@ -169,6 +169,65 @@ def get_field(entry, field):
     return out
 
 
+# format per IEEE, give it anything _reasonable_
+def format_month(month_input: str) -> str:
+    """
+    possible inputs: '4', '04', 'apr', 'April', 'apr.'
+    """
+    if not month_input:
+        return ""
+
+    clean_input = str(month_input).lower().strip().replace(".", "")
+
+    month_map = {
+        "1": "Jan.",
+        "01": "Jan.",
+        "jan": "Jan.",
+        "january": "Jan.",
+        "2": "Feb.",
+        "02": "Feb.",
+        "feb": "Feb.",
+        "february": "Feb.",
+        "3": "Mar.",
+        "03": "Mar.",
+        "mar": "Mar.",
+        "march": "Mar.",
+        "4": "Apr.",
+        "04": "Apr.",
+        "apr": "Apr.",
+        "april": "Apr.",
+        "5": "May",
+        "05": "May",
+        "may": "May",
+        "6": "June",
+        "06": "June",
+        "june": "June",
+        "7": "July",
+        "07": "July",
+        "july": "July",
+        "8": "Aug.",
+        "08": "Aug.",
+        "aug": "Aug.",
+        "august": "Aug.",
+        "9": "Sept.",
+        "09": "Sept.",
+        "sep": "Sept.",
+        "sept": "Sept.",
+        "september": "Sept.",
+        "10": "Oct.",
+        "oct": "Oct.",
+        "october": "Oct.",
+        "11": "Nov.",
+        "nov": "Nov.",
+        "november": "Nov.",
+        "12": "Dec.",
+        "dec": "Dec.",
+        "december": "Dec.",
+    }
+
+    return month_map.get(clean_input, month_input.capitalize())
+
+
 def format_entry(entry) -> str:
     mnemonic = get_field(entry, "ID")
     etype = get_field(entry, "ENTRYTYPE")

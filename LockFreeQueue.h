@@ -27,13 +27,9 @@ _Static_assert(((CLF_QUEUE_SIZE & (CLF_QUEUE_SIZE - 1)) == 0),
 // An iteration on Le2013, itself an iteration from Lamport1983
 typedef struct LockFreeQueue LockFreeQueue;
 struct LockFreeQueue {
-    // Consumer state, on a different cache line from Producer state
-    // won't be invalidated by Producer thread
-    _Alignas(CACHE_LINE) _Atomic size_t front;  // shared (S)
-
-    // Producer state
+    // avoid false sharing
+    _Alignas(CACHE_LINE) _Atomic size_t front;
     _Alignas(CACHE_LINE) _Atomic size_t back;
-
     _Alignas(CACHE_LINE) float data[CLF_QUEUE_SIZE];
 };
 

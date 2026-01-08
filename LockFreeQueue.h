@@ -1,5 +1,11 @@
 #pragma once
 
+// SPSC Lock-Free Queue
+//
+// Logic based on the WeakRB algorithm by Le et al. (2013),
+// which formalizes and optimizes the original concurrent
+// ring buffer principles established by Leslie Lamport (1983).
+
 #include <stdatomic.h>
 #include <stdbool.h>
 #include <stddef.h>

@@ -57,12 +57,16 @@ struct LockFreeQueueProducer {
 
 LockFreeQueueProducer clfq_producer(LockFreeQueue* clfq);
 
-// pessimistic estimate using cached `front`
+// pessimistic estimate using cached `front`. no atomic load at all
 // there might be more available
 size_t clfq_producer_size_lazy(const LockFreeQueueProducer* producer);
 
-// loads `front` and updates `cached_front`
+// loads `front` with `acquire` ordering and updates `cached_front`
 size_t clfq_producer_size_eager(LockFreeQueueProducer* producer);
+
+// push operations sometimes `acquire` load `front` when the pessimistic lazy
+// size is not enough
+// push operations always publish the new `back` with `release` ordering
 
 // no partial transactions
 bool clfq_push(LockFreeQueueProducer* restrict producer,
@@ -104,13 +108,16 @@ size_t clfq_pop_partial(LockFreeQueueConsumer* restrict consumer,
 // has to guarantee a contiguous slice and so does not cross the buffer boundary
 
 // Returns size of contiguous slice available using cached_back
+// no load is performed
 size_t clfq_consumer_peek_lazy(const LockFreeQueueConsumer* consumer,
                                const float** ptr);
 
 // Updates cached_back then returns contiguous slice size.
+// `back` is loaded with `acquire` ordering
 size_t clfq_consumer_peek_eager(LockFreeQueueConsumer* consumer,
                                 const float** ptr);
 
 // unsafe, will cross the write end if not careful
 // meant to be called after peek to consume data that we know is there
+// the new read end is published with `release` ordering
 void clfq_consumer_skip(LockFreeQueueConsumer* consumer, size_t n);

@@ -63,19 +63,18 @@ size_t clfq_push_partial(LockFreeQueueProducer* producer,
                          const float* elems,
                          size_t n);
 
+// the API (and implementation) is pretty much symmetric, see Producer for info
 typedef struct LockFreeQueueConsumer LockFreeQueueConsumer;
 struct LockFreeQueueConsumer {
-    _Atomic size_t* front;       // sole writer
-    const _Atomic size_t* back;  // read only
-    size_t cached_back;          // avoid pessimistic loads
+    _Atomic size_t* front;
+    const _Atomic size_t* back;
+    size_t cached_back;
     const float* data;
 };
 
 LockFreeQueueConsumer clfq_consumer(LockFreeQueue* clfq);
 
-// no partial transactions
 bool clfq_pop(LockFreeQueueConsumer* consumer, float* elems, size_t n);
-// pop as many as possible, return samples read and consumed
 size_t clfq_pop_partial(LockFreeQueueConsumer* consumer,
                         float* elems,
                         size_t n);

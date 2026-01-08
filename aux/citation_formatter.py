@@ -47,10 +47,18 @@ class Reference:
         self.authors = None
 
     def set_title(self, title):
+        title = title.strip()
+        if title[-1] != ".":
+            title += "."
         self.title = title
 
     def set_authors(self, authors):
         self.authors = authors
+
+    def format(self):
+        authors = "; ".join(author.jacs() for author in self.authors)
+
+        return f"{authors} {self.title}"
 
     def log(self):
         print(f"Title:\n    {self.title}")
@@ -75,4 +83,5 @@ for entry in bib_database.entries:
     references.append(ref)
 
 for ref in references:
-    ref.log()
+    print(ref.format())
+    print()

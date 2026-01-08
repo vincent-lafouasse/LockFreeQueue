@@ -55,8 +55,7 @@ class Reference:
     def log(self):
         print(f"Title:\n    {self.title}")
         print(f"Authors:")
-        for author in self.authors:
-            print(f"    {author}")
+        print(f"    {"; ".join(author.jacs() for author in self.authors)}")
         print()
 
 

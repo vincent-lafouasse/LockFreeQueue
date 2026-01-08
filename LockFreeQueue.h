@@ -5,6 +5,8 @@
 // Logic based on the WeakRB algorithm by Le et al. (2013),
 // which formalizes and optimizes the original concurrent
 // ring buffer principles established by Leslie Lamport (1983).
+//
+// meant for batch use (audio) rather than elementwise processing
 
 #include <stdatomic.h>
 #include <stdbool.h>

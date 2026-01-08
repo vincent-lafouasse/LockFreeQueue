@@ -230,25 +230,39 @@ def format_month(month_input: str) -> str:
 
 def format_entry(entry) -> str:
     mnemonic = get_field(entry, "ID")
-    etype = get_field(entry, "ENTRYTYPE")
+    etype = get_field(entry, "ENTRYTYPE").lower()
 
     authors = AuthorList.parse(get_field(entry, "author"))
-    title = get_field(entry, "title")
+    title = get_field(entry, "title").strip("{}")
     year = get_field(entry, "year")
     archive = get_field(entry, "archive")
 
-    header = f'[{mnemonic}] {authors.ieee()}, "{title}",'
+    header = f'[{mnemonic}] {authors.ieee()}, "{title},"'
     link = Markdown.link(archive, "Archive")
-    footer = f"{year}. {link}"
 
     if etype == "article":
-        middle = ""
+        jrnl = Markdown.it(get_field(entry, "journal"))
+        vol = get_field(entry, "volume")
+        num = get_field(entry, "number")
+        pages = get_field(entry, "pages").replace("--", "–")
+        month = format_month(get_field(entry, "month"))
+        middle = f" {jrnl}, vol. {vol}, no. {num}, pp. {pages}, {month} "
     elif etype == "inproceedings":
-        middle = ""
+        # Using series as an optional bonus if present, otherwise booktitle only
+        venue = get_field(entry, "booktitle").replace("Proceedings of the", "Proc.")
+        series = entry.get("series")
+        venue_str = f"{venue} ({series})" if series else venue
+        pages = (
+            get_field(entry, "pages")
+            .replace("–", "-")
+            .replace("--", "-")
+            .replace("-", "–")
+        )
+        middle = f" in {Markdown.it(venue_str)}, pp. {pages}, "
     else:
-        middle = ""
+        middle = " "
 
-    return f"{header}{middle}{footer}."
+    return f"{header}{middle}{year}. {link}."
 
 
 def main():

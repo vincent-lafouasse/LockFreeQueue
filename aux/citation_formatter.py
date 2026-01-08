@@ -17,6 +17,6 @@ for entry in bib_database.entries:
 for item in parsed_data:
     print(f"Title:\n    {item['title']}")
     print(f"Authors:")
-    for author in item['authors']:
+    for author in item["authors"]:
         print(f"    {author}")
     print()

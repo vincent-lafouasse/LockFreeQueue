@@ -72,18 +72,30 @@ LockFreeQueueConsumer clfq_consumer(LockFreeQueue* clfq)
     };
 }
 
-bool clfq_pop(LockFreeQueueConsumer* consumer, float* elems, size_t n)
+size_t clfq_consumer_size_lazy(const LockFreeQueueConsumer* consumer)
 {
     const size_t front =
         atomic_load_explicit(consumer->front, memory_order_relaxed);
 
-    if (distance(front, consumer->cached_back) < n) {
-        consumer->cached_back =
-            atomic_load_explicit(consumer->back, memory_order_acquire);
-        if (distance(front, consumer->cached_back) < n) {
-            return false;
-        }
+    return distance(front, consumer->cached_back);
+}
+
+size_t clfq_consumer_size_eager(LockFreeQueueConsumer* consumer)
+{
+    consumer->cached_back =
+        atomic_load_explicit(consumer->back, memory_order_acquire);
+    return clfq_consumer_size_lazy(consumer);
+}
+
+bool clfq_pop(LockFreeQueueConsumer* consumer, float* elems, size_t n)
+{
+    if (clfq_consumer_size_lazy(consumer) < n &&
+        clfq_consumer_size_eager(consumer) < n) {
+        return false;
     }
+
+    const size_t front =
+        atomic_load_explicit(consumer->front, memory_order_relaxed);
 
     for (size_t i = 0; i < n; i++) {
         elems[i] = consumer->data[(front + i) & (CLF_QUEUE_SIZE - 1)];

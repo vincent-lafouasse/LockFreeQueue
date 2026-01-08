@@ -63,7 +63,8 @@ class Reference:
     def log(self):
         print(f"Title:\n    {self.title}")
         print(f"Authors:")
-        print(f"    {"; ".join(author.jacs() for author in self.authors)}")
+        for author in self.authors:
+            print(f"    {author}")
         print()
 
 
@@ -83,5 +84,6 @@ for entry in bib_database.entries:
     references.append(ref)
 
 for ref in references:
+    ref.log()
     print(ref.format())
     print()

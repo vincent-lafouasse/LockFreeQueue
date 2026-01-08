@@ -54,3 +54,34 @@ bool clfq_push(LockFreeQueueProducer* producer, const float* elems, size_t n)
     atomic_store_explicit(producer->back, back + n, memory_order_release);
     return true;
 }
+
+LockFreeQueueConsumer clfq_consumer(LockFreeQueue* clfq)
+{
+    return (LockFreeQueueConsumer){
+        .front = &clfq->front,
+        .back = &clfq->back,
+        .cached_back = 0,
+        .data = clfq->data,
+    };
+}
+
+bool clfq_pop(LockFreeQueueConsumer* consumer, float* elems, size_t n)
+{
+    const size_t front =
+        atomic_load_explicit(consumer->front, memory_order_relaxed);
+
+    if (distance(front, consumer->cached_back) < n) {
+        consumer->cached_back =
+            atomic_load_explicit(consumer->back, memory_order_acquire);
+        if (distance(front, consumer->cached_back) < n) {
+            return false;
+        }
+    }
+
+    for (size_t i = 0; i < n; i++) {
+        elems[i] = consumer->data[(front + i) & (CLF_QUEUE_SIZE - 1)];
+    }
+
+    atomic_store_explicit(consumer->front, front + n, memory_order_release);
+    return true;
+}

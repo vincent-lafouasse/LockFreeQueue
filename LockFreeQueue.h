@@ -35,6 +35,8 @@ struct LockFreeQueue {
     _Alignas(CACHE_LINE) float data[CLF_QUEUE_SIZE];
 };
 
+LockFreeQueue clfq_new(void);
+
 typedef struct LockFreeQueueProducer LockFreeQueueProducer;
 struct LockFreeQueueProducer {
     _Atomic size_t* back;         // sole writer
@@ -43,9 +45,20 @@ struct LockFreeQueueProducer {
     float* data;
 };
 
-LockFreeQueue clfq_new(void);
-
 LockFreeQueueProducer clfq_producer(LockFreeQueue* clfq);
 
 // no partial transactions
 bool clfq_push(LockFreeQueueProducer* producer, const float* elems, size_t n);
+
+typedef struct LockFreeQueueConsumer LockFreeQueueConsumer;
+struct LockFreeQueueConsumer {
+    _Atomic size_t* front;       // sole writer
+    const _Atomic size_t* back;  // read only
+    size_t cached_back;          // avoid pessimistic loads
+    const float* data;
+};
+
+LockFreeQueueConsumer clfq_consumer(LockFreeQueue* clfq);
+
+// no partial transactions
+bool clfq_pop(LockFreeQueueConsumer* consumer, float* elems, size_t n);

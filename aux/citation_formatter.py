@@ -251,7 +251,7 @@ def format_entry(entry) -> str:
     year = get_field(entry, "year")
     archive = get_field(entry, "archive")
 
-    header = f'[{mnemonic}] {authors.ieee()}, "{title},"'
+    header = f'\\[{mnemonic}\\] {authors.ieee()}, "{title},"'
 
     archive_link = Markdown.link(archive, "Archive")
     doi = entry.get("doi")

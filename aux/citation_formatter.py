@@ -238,10 +238,17 @@ def format_entry(entry) -> str:
     archive = get_field(entry, "archive")
 
     header = f'[{mnemonic}] {authors.ieee()}, "{title}",'
-    footer = Markdown.link(archive, "Archive")
+    link = Markdown.link(archive, "Archive")
+    footer = f"{year}. {link}."
 
-    # to be replaced with a if/else that fills the middle
-    return f"{header} {footer}."
+    if etype == "article":
+        middle = ""
+    elif etype == "inproceedings":
+        middle = ""
+    else:
+        middle = ""
+
+    return f"{header}{middle}{footer}."
 
 
 def main():

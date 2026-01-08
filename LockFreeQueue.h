@@ -59,7 +59,7 @@ bool clfq_push(LockFreeQueueProducer* producer,
                size_t n);
 // push as many as possible, return samples written
 size_t clfq_push_partial(LockFreeQueueProducer* producer,
-                         const float* elems,
+                         const float* restrict elems,
                          size_t n);
 
 // -------------------- Consumer API --------------------
@@ -79,5 +79,5 @@ size_t clfq_consumer_size_eager(LockFreeQueueConsumer* consumer);
 
 bool clfq_pop(LockFreeQueueConsumer* consumer, float* restrict elems, size_t n);
 size_t clfq_pop_partial(LockFreeQueueConsumer* consumer,
-                        float* elems,
+                        float* restrict elems,
                         size_t n);

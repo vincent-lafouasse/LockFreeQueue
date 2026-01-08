@@ -40,7 +40,7 @@ size_t clfq_producer_size_eager(LockFreeQueueProducer* producer)
     return clfq_producer_size_lazy(producer);
 }
 
-bool clfq_push(LockFreeQueueProducer* producer,
+bool clfq_push(LockFreeQueueProducer* restrict producer,
                const float* restrict elems,
                size_t n)
 {
@@ -89,7 +89,9 @@ size_t clfq_consumer_size_eager(LockFreeQueueConsumer* consumer)
     return clfq_consumer_size_lazy(consumer);
 }
 
-bool clfq_pop(LockFreeQueueConsumer* consumer, float* restrict elems, size_t n)
+bool clfq_pop(LockFreeQueueConsumer* restrict consumer,
+              float* restrict elems,
+              size_t n)
 {
     if (clfq_consumer_size_lazy(consumer) < n &&
         clfq_consumer_size_eager(consumer) < n) {

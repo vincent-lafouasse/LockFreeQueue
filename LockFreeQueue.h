@@ -54,11 +54,11 @@ size_t clfq_producer_size_lazy(const LockFreeQueueProducer* producer);
 size_t clfq_producer_size_eager(LockFreeQueueProducer* producer);
 
 // no partial transactions
-bool clfq_push(LockFreeQueueProducer* producer,
+bool clfq_push(LockFreeQueueProducer* restrict producer,
                const float* restrict elems,
                size_t n);
 // push as many as possible, return samples written
-size_t clfq_push_partial(LockFreeQueueProducer* producer,
+size_t clfq_push_partial(LockFreeQueueProducer* restrict producer,
                          const float* restrict elems,
                          size_t n);
 
@@ -78,6 +78,6 @@ size_t clfq_consumer_size_lazy(const LockFreeQueueConsumer* consumer);
 size_t clfq_consumer_size_eager(LockFreeQueueConsumer* consumer);
 
 bool clfq_pop(LockFreeQueueConsumer* consumer, float* restrict elems, size_t n);
-size_t clfq_pop_partial(LockFreeQueueConsumer* consumer,
+size_t clfq_pop_partial(LockFreeQueueConsumer* restrict consumer,
                         float* restrict elems,
                         size_t n);

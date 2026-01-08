@@ -160,43 +160,6 @@ class AuthorList:
         return ", ".join(formatted_names[:-1]) + f", and {formatted_names[-1]}"
 
 
-class Reference:
-    def __init__(self, entry):
-        self.mnemonic = entry.get("ID")
-        self.ref_type = entry.get("ENTRYTYPE")
-
-        self.year = entry.get("year")
-
-        self.set_title(entry.get("title", None))
-        self.authors = Reference.parse_authors(entry.get("author", ""))
-
-    def set_title(self, title):
-        title = title.strip()
-        if title[-1] != ".":
-            title += "."
-        self.title = title
-
-    @staticmethod
-    def parse_authors(string):
-        author_list = re.split(r"\s+and\s+", string, flags=re.IGNORECASE)
-        author_list = [author.strip() for author in author_list]
-        return [Author.parse(author) for author in author_list]
-
-    def format(self):
-        authors = "; ".join(author.jacs() for author in self.authors)
-
-        return f"{authors} {self.title}"
-
-    def log(self):
-        print(f"{self.mnemonic} ({self.ref_type}) {{")
-        print(f"    Title:")
-        print(f"        {self.title}")
-        print(f"    Authors:")
-        for author in self.authors:
-            print(f"        {author}")
-        print()
-
-
 # a double sanity check that the field exists
 def get_field(entry, field):
     mnemonic = entry.get("ID")
@@ -208,12 +171,18 @@ def get_field(entry, field):
 
 def format_entry(entry) -> str:
     mnemonic = get_field(entry, "ID")
-    etype = get_entry(entry, "ENTRYTYPE")
+    etype = get_field(entry, "ENTRYTYPE")
 
-    authors = AuthorList.parse(get_entry(entry, "author"))
-    title = get_entry(entry, "title")
-    year = get_entry(entry, "year")
-    archive = get_entry(entry, "archive")
+    authors = AuthorList.parse(get_field(entry, "author"))
+    title = get_field(entry, "title")
+    year = get_field(entry, "year")
+    archive = get_field(entry, "archive")
+
+    header = f'[{mnemonic}] {authors.ieee()}, "{title}",'
+    footer = Markdown.link(archive, "Archive")
+
+    # to be replaced with a if/else that fills the middle
+    return f"{header} {footer}."
 
 
 def main():
@@ -222,11 +191,8 @@ def main():
 
     validate_library(library)
 
-    references = [Reference(entry) for entry in library.entries]
-
-    for ref in references:
-        ref.log()
-        print(ref.format())
+    for entry in library.entries:
+        print(format_entry(entry))
         print()
 
 

@@ -77,7 +77,9 @@ LockFreeQueueConsumer clfq_consumer(LockFreeQueue* clfq);
 size_t clfq_consumer_size_lazy(const LockFreeQueueConsumer* consumer);
 size_t clfq_consumer_size_eager(LockFreeQueueConsumer* consumer);
 
-bool clfq_pop(LockFreeQueueConsumer* consumer, float* restrict elems, size_t n);
+bool clfq_pop(LockFreeQueueConsumer* restrict consumer,
+              float* restrict elems,
+              size_t n);
 size_t clfq_pop_partial(LockFreeQueueConsumer* restrict consumer,
                         float* restrict elems,
                         size_t n);

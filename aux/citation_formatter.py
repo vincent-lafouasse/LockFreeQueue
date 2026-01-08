@@ -26,6 +26,48 @@ TYPE_SPECIFIC_REQUIRED = {
 }
 
 
+def validate_entry(entry):
+    entry_type = entry.get("ENTRYTYPE").lower()
+
+    fields = set(entry.keys())
+
+    # set operations
+    missing_common_fields = COMMON_REQUIRED - fields
+
+    specific_fields = TYPE_SPECIFIC_REQUIRED.get(entry_type)
+    if specific_fields is None:
+        print(f"Unrecognised entry type: {entry_type}. No required fields")
+        specific_fields = set()
+
+    missing_specific_fields = specific_fields - fields
+
+    valid = True
+
+    for missing in missing_common_fields:
+        print(f"{entry.get("ID")}: missing common field:\t{missing}")
+        valid = False
+
+    for missing in missing_specific_fields:
+        print(f"{entry.get("ID")}: missing specific field:\t{missing}")
+        valid = False
+
+    if valid:
+        valid_str = "ok"
+    else:
+        valid_str = "ko"
+    print(f"---- {entry.get("ID")}: {valid_str}")
+    return valid
+
+
+def validate_library(library):
+    invalid_entries = [
+        entry.get("ID") for entry in library.entries if not validate_entry(entry)
+    ]
+
+    if len(invalid_entries) != 0:
+        raise ValueError("Malformed library")
+
+
 class Markdown:
     @staticmethod
     def bold(text):
@@ -121,6 +163,8 @@ class Reference:
 def main():
     with open("references.bib") as bibtex_file:
         library = bibtexparser.load(bibtex_file)
+
+    validate_library(library)
 
     references = [Reference(entry) for entry in library.entries]
 

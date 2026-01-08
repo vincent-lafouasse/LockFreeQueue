@@ -16,7 +16,7 @@
 // harmless padding on 64B systems
 #define CACHE_LINE 128
 
-#define CLF_QUEUE_SIZE 1024
+#define CLF_QUEUE_SIZE 4096 // 16KB
 
 #define INVALID_QUEUE_SIZE_MSG                                      \
     "Concurrent lock free queue size must be a power of 2 in this " \

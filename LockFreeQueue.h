@@ -29,8 +29,8 @@ _Static_assert(((CLF_QUEUE_SIZE & (CLF_QUEUE_SIZE - 1)) == 0),
 typedef struct LockFreeQueue LockFreeQueue;
 struct LockFreeQueue {
     // avoid false sharing
-    alignas(CACHE_LINE) _Atomic size_t front;
-    alignas(CACHE_LINE) _Atomic size_t back;
+    alignas(CACHE_LINE) _Atomic(size_t) front;
+    alignas(CACHE_LINE) _Atomic(size_t) back;
     alignas(CACHE_LINE) float data[CLF_QUEUE_SIZE];
 };
 
@@ -39,8 +39,8 @@ LockFreeQueue clfq_new(void);
 // -------------------- Producer API --------------------
 typedef struct LockFreeQueueProducer LockFreeQueueProducer;
 struct LockFreeQueueProducer {
-    _Atomic size_t* back;         // sole writer
-    const _Atomic size_t* front;  // read only
+    _Atomic(size_t)* back;         // sole writer
+    const _Atomic(size_t)* front;  // read only
     size_t cached_front;          // avoid pessimistic loads
     float* data;
 };
@@ -65,8 +65,8 @@ size_t clfq_push_partial(LockFreeQueueProducer* producer,
 // the API (and implementation) is pretty much symmetric, see Producer for info
 typedef struct LockFreeQueueConsumer LockFreeQueueConsumer;
 struct LockFreeQueueConsumer {
-    _Atomic size_t* front;
-    const _Atomic size_t* back;
+    _Atomic(size_t)* front;
+    const _Atomic(size_t)* back;
     size_t cached_back;
     const float* data;
 };

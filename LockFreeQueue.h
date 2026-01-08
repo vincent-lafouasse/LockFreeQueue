@@ -51,6 +51,10 @@ LockFreeQueueProducer clfq_producer(LockFreeQueue* clfq);
 
 // no partial transactions
 bool clfq_push(LockFreeQueueProducer* producer, const float* elems, size_t n);
+// push as many as possible, return samples written
+size_t clfq_push_partial(LockFreeQueueProducer* producer,
+                         const float* elems,
+                         size_t n);
 
 typedef struct LockFreeQueueConsumer LockFreeQueueConsumer;
 struct LockFreeQueueConsumer {
@@ -64,3 +68,7 @@ LockFreeQueueConsumer clfq_consumer(LockFreeQueue* clfq);
 
 // no partial transactions
 bool clfq_pop(LockFreeQueueConsumer* consumer, float* elems, size_t n);
+// pop as many as possible, return samples read and consumed
+size_t clfq_pop_partial(LockFreeQueueConsumer* consumer,
+                        float* elems,
+                        size_t n);

@@ -4,6 +4,28 @@ import re
 with open("references.bib") as bibtex_file:
     bib_database = bibtexparser.load(bibtex_file)
 
+
+class Author:
+    def __init__(self, first_names, last_name):
+        # first_names is expected to be a list of strings
+        self.first_names = first_names
+        self.last_name = last_name
+
+    def jacs(self):
+        # Format: Last, F. M.
+        initials = " ".join([f"{n[0]}." for n in self.first_names])
+        return f"{self.last_name}, {initials}"
+
+    def __repr__(self):
+        return f"Author({self.last_name}, {self.first_names})"
+
+
+class Reference:
+    def __init__(self):
+        self.title = None
+        self.authors = None
+
+
 parsed_data = []
 
 for entry in bib_database.entries:

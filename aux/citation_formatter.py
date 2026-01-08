@@ -11,6 +11,27 @@ class Author:
         self.first_names = first_names
         self.last_name = last_name
 
+    @classmethod
+    def parse(cls, name_string):
+        name_string = name_string.strip()
+
+        if "," in name_string:
+            # Format: Last, First Middle
+            parts = name_string.split(",")
+            last_name = parts[0].strip()
+            first_names = parts[1].strip().split()
+        else:
+            # Format: First Middle Last
+            parts = name_string.split()
+            if len(parts) > 1:
+                last_name = parts[-1]
+                first_names = parts[:-1]
+            else:
+                last_name = parts[0]
+                first_names = []
+
+        return cls(first_names, last_name)
+
     def jacs(self):
         # Format: Last, F. M.
         initials = " ".join([f"{n[0]}." for n in self.first_names])

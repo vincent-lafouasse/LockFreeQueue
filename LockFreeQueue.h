@@ -83,10 +83,12 @@ size_t clfq_pop_partial(LockFreeQueueConsumer* restrict consumer,
                         size_t n);
 
 // Returns size of contiguous slice available using cached_back
-size_t clfq_consumer_peek_lazy(const LockFreeQueueConsumer* consumer, const float** ptr);
+size_t clfq_consumer_peek_lazy(const LockFreeQueueConsumer* consumer,
+                               const float** ptr);
 
 // Updates cached_back then returns contiguous slice size.
-size_t clfq_consumer_peek_eager(LockFreeQueueConsumer* consumer, const float** ptr);
+size_t clfq_consumer_peek_eager(LockFreeQueueConsumer* consumer,
+                                const float** ptr);
 
 // unsafe, will cross the write end if not careful
 // meant to be called after peek

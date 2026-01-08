@@ -1,9 +1,6 @@
 import bibtexparser
 import re
 
-with open("references.bib") as bibtex_file:
-    bib_database = bibtexparser.load(bibtex_file)
-
 
 class Author:
     def __init__(self, first_names, last_name):
@@ -41,10 +38,6 @@ class Author:
         return f"Author({self.last_name}, {self.first_names})"
 
 
-def md_link(text, url):
-    return f"[text]{{url}}"
-
-
 class Reference:
     def __init__(self):
         self.title = None
@@ -72,22 +65,30 @@ class Reference:
         print()
 
 
-references = []
+def main():
+    with open("references.bib") as bibtex_file:
+        bib_database = bibtexparser.load(bibtex_file)
 
-for entry in bib_database.entries:
-    ref = Reference()
+    references = []
 
-    ref.set_title(entry.get("title", None))
+    for entry in bib_database.entries:
+        ref = Reference()
 
-    raw_authors = entry.get("author", "")
-    author_list = re.split(r"\s+and\s+", raw_authors, flags=re.IGNORECASE)
-    author_list = [author.strip() for author in author_list]
-    author_list = [Author.parse(author) for author in author_list]
-    ref.set_authors(author_list)
+        ref.set_title(entry.get("title", None))
 
-    references.append(ref)
+        raw_authors = entry.get("author", "")
+        author_list = re.split(r"\s+and\s+", raw_authors, flags=re.IGNORECASE)
+        author_list = [author.strip() for author in author_list]
+        author_list = [Author.parse(author) for author in author_list]
+        ref.set_authors(author_list)
 
-for ref in references:
-    ref.log()
-    print(ref.format())
-    print()
+        references.append(ref)
+
+    for ref in references:
+        ref.log()
+        print(ref.format())
+        print()
+
+
+if __name__ == "__main__":
+    main()

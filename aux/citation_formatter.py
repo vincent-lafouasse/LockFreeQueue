@@ -239,7 +239,7 @@ def format_entry(entry) -> str:
 
     header = f'[{mnemonic}] {authors.ieee()}, "{title}",'
     link = Markdown.link(archive, "Archive")
-    footer = f"{year}. {link}."
+    footer = f"{year}. {link}"
 
     if etype == "article":
         middle = ""

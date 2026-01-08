@@ -40,7 +40,9 @@ size_t clfq_producer_size_eager(LockFreeQueueProducer* producer)
     return clfq_producer_size_lazy(producer);
 }
 
-bool clfq_push(LockFreeQueueProducer* producer, const float* elems, size_t n)
+bool clfq_push(LockFreeQueueProducer* producer,
+               const float* restrict elems,
+               size_t n)
 {
     // check pessimistically, if it's fine do not reload `front`
     // we consider relaxed loading of private `back` free
@@ -87,7 +89,7 @@ size_t clfq_consumer_size_eager(LockFreeQueueConsumer* consumer)
     return clfq_consumer_size_lazy(consumer);
 }
 
-bool clfq_pop(LockFreeQueueConsumer* consumer, float* elems, size_t n)
+bool clfq_pop(LockFreeQueueConsumer* consumer, float* restrict elems, size_t n)
 {
     if (clfq_consumer_size_lazy(consumer) < n &&
         clfq_consumer_size_eager(consumer) < n) {

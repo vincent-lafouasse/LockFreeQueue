@@ -164,6 +164,7 @@ class Reference:
     def __init__(self, entry):
         self.mnemonic = entry.get("ID")
         self.ref_type = entry.get("ENTRYTYPE")
+
         self.year = entry.get("year")
 
         self.set_title(entry.get("title", None))
@@ -194,6 +195,25 @@ class Reference:
         for author in self.authors:
             print(f"        {author}")
         print()
+
+
+# a double sanity check that the field exists
+def get_field(entry, field):
+    mnemonic = entry.get("ID")
+    out = entry.get(field)
+    if out is None or not str(out).strip():
+        raise ValueError(f"{mnemonic} has no field {field}")
+    return out
+
+
+def format_entry(entry) -> str:
+    mnemonic = get_field(entry, "ID")
+    etype = get_entry(entry, "ENTRYTYPE")
+
+    authors = AuthorList.parse(get_entry(entry, "author"))
+    title = get_entry(entry, "title")
+    year = get_entry(entry, "year")
+    archive = get_entry(entry, "archive")
 
 
 def main():

@@ -139,7 +139,7 @@ class AuthorList:
         self.author_list = author_list
 
     @classmethod
-    def parse_authors(cls, string):
+    def parse(cls, string):
         author_list = re.split(r"\s+and\s+", string, flags=re.IGNORECASE)
         author_list = [author.strip() for author in author_list]
         author_list = [Author.parse(author) for author in author_list]

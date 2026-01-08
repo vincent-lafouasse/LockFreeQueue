@@ -24,7 +24,7 @@
 _Static_assert(((CLF_QUEUE_SIZE & (CLF_QUEUE_SIZE - 1)) == 0),
                INVALID_QUEUE_SIZE_MSG);
 
-// An iteration on Le2013, itself an iteration from Lamport1983
+// -------------------- Shared storage --------------------
 typedef struct LockFreeQueue LockFreeQueue;
 struct LockFreeQueue {
     // avoid false sharing
@@ -35,6 +35,7 @@ struct LockFreeQueue {
 
 LockFreeQueue clfq_new(void);
 
+// -------------------- Producer API --------------------
 typedef struct LockFreeQueueProducer LockFreeQueueProducer;
 struct LockFreeQueueProducer {
     _Atomic size_t* back;         // sole writer
@@ -59,6 +60,7 @@ size_t clfq_push_partial(LockFreeQueueProducer* producer,
                          const float* elems,
                          size_t n);
 
+// -------------------- Consumer API --------------------
 // the API (and implementation) is pretty much symmetric, see Producer for info
 typedef struct LockFreeQueueConsumer LockFreeQueueConsumer;
 struct LockFreeQueueConsumer {

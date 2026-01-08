@@ -16,6 +16,8 @@ TYPE_SPECIFIC_REQUIRED = {
         "journal",
         "volume",
         "pages",
+        "number", # issue
+        "month",
         "doi",
     },
     "inproceedings": {

@@ -33,7 +33,7 @@ struct LockFreeQueue {
     alignas(CACHE_LINE) float data[CLF_QUEUE_SIZE];
 };
 
-LockFreeQueue clfq_new(void);
+void clfq_new(LockFreeQueue* clfq);
 
 // -------------------- Producer API --------------------
 typedef struct LockFreeQueueProducer LockFreeQueueProducer;

@@ -2,13 +2,10 @@
 
 #include <stdatomic.h>
 
-LockFreeQueue clfq_new(void)
+void clfq_new(LockFreeQueue* clfq)
 {
-    LockFreeQueue out;
-
-    atomic_init(&out.front, 0);
-    atomic_init(&out.back, 0);
-    return out;
+    atomic_init(&clfq->front, 0);
+    atomic_init(&clfq->back, 0);
 }
 
 LockFreeQueueProducer clfq_producer(LockFreeQueue* clfq)

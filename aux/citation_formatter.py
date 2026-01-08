@@ -135,9 +135,18 @@ class Author:
 
 
 class AuthorList:
-    @staticmethod
-    def ieee(author_list) -> str:
-        formatted_names = [a.ieee() for a in authors]
+    def __init__(self, author_list):
+        self.author_list = author_list
+
+    @classmethod
+    def parse_authors(cls, string):
+        author_list = re.split(r"\s+and\s+", string, flags=re.IGNORECASE)
+        author_list = [author.strip() for author in author_list]
+        author_list = [Author.parse(author) for author in author_list]
+        return cls(author_list)
+
+    def ieee(self):
+        formatted_names = [a.ieee() for a in self.author_list]
         count = len(formatted_names)
 
         if count == 0:

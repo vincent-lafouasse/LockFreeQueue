@@ -19,9 +19,9 @@ _Static_assert(((CLF_QUEUE_SIZE & (CLF_QUEUE_SIZE - 1)) == 0),
 typedef struct LockFreeQueue LockFreeQueue;
 struct LockFreeQueue {
     // Consumer state, on a different cache line from Producer state
-    _Alignas(CACHE_LINE) _Atomic size_t front;
+    _Alignas(CACHE_LINE) _Atomic size_t front; // shared (S)
     // private to Consumer, won't be invalidated by Producer thread
-    size_t cached_back;
+    size_t cached_back; // shared, not exclusive (E), didn't want to waste more memory
 
     // Producer state
     _Alignas(CACHE_LINE) _Atomic size_t back;
@@ -46,4 +46,11 @@ LockFreeQueueProducer clfq_producer(LockFreeQueue* clfq)
                                    .front = &clfq->front,
                                    .cached_front = &clfq->cached_front,
                                    .data = clfq->data};
+}
+
+size_t distance(size_t front, size_t back)
+{
+    // scary underflow is actualy fine and expected behaviour
+    // expects the queue size to be a power of 2 
+    return (back - front) & (CLF_QUEUE_SIZE - 1);
 }

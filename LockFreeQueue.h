@@ -8,6 +8,7 @@
 //
 // meant for batch use (audio) rather than elementwise processing
 
+#include <stdalign.h>
 #include <stdatomic.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -28,9 +29,9 @@ _Static_assert(((CLF_QUEUE_SIZE & (CLF_QUEUE_SIZE - 1)) == 0),
 typedef struct LockFreeQueue LockFreeQueue;
 struct LockFreeQueue {
     // avoid false sharing
-    _Alignas(CACHE_LINE) _Atomic size_t front;
-    _Alignas(CACHE_LINE) _Atomic size_t back;
-    _Alignas(CACHE_LINE) float data[CLF_QUEUE_SIZE];
+    alignas(CACHE_LINE) _Atomic size_t front;
+    alignas(CACHE_LINE) _Atomic size_t back;
+    alignas(CACHE_LINE) float data[CLF_QUEUE_SIZE];
 };
 
 LockFreeQueue clfq_new(void);

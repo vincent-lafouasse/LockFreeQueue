@@ -123,8 +123,32 @@ class Author:
         initials = " ".join([f"{n[0]}." for n in self.first_names])
         return f"{self.last_name}, {initials}"
 
+    def ieee(self) -> str:
+        """Format: F. M. Last"""
+        if not self.first_names:
+            return self.last_name
+        initials = " ".join([f"{n[0]}." for n in self.first_names])
+        return f"{initials} {self.last_name}"
+
     def __repr__(self):
         return f"Author({self.last_name}, {self.first_names})"
+
+
+class AuthorList:
+    @staticmethod
+    def ieee(author_list) -> str:
+        formatted_names = [a.ieee() for a in authors]
+        count = len(formatted_names)
+
+        if count == 0:
+            return ""
+        if count == 1:
+            return formatted_names[0]
+        if count == 2:
+            return f"{formatted_names[0]} and {formatted_names[1]}"
+
+        # for 3+, use Oxford comma per IEEE
+        return ", ".join(formatted_names[:-1]) + f", and {formatted_names[-1]}"
 
 
 class Reference:

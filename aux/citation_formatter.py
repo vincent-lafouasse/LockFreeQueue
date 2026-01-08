@@ -2,6 +2,26 @@ import bibtexparser
 import re
 
 
+class Markdown:
+    @staticmethod
+    def bold(text):
+        return f"**{text}**" if text else ""
+
+    @staticmethod
+    def it(text):
+        return f"*{text}*" if text else ""
+
+    @staticmethod
+    def link(url, text=None):
+        if not text:
+            text = url
+        return f"[{text}]({url})"
+
+    @staticmethod
+    def sup(text):
+        return f"^{text}^" if text else ""
+
+
 class Author:
     def __init__(self, first_names, last_name):
         # first_names is expected to be a list of strings

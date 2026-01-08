@@ -41,6 +41,10 @@ class Author:
         return f"Author({self.last_name}, {self.first_names})"
 
 
+def md_link(text, url):
+    return f"[text]{{url}}"
+
+
 class Reference:
     def __init__(self):
         self.title = None

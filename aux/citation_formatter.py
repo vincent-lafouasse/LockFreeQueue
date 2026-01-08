@@ -46,20 +46,34 @@ class Reference:
         self.title = None
         self.authors = None
 
+    def set_title(self, title):
+        self.title = title
 
-parsed_data = []
+    def set_authors(self, authors):
+        self.authors = authors
+
+    def log(self):
+        print(f"Title:\n    {self.title}")
+        print(f"Authors:")
+        for author in self.authors:
+            print(f"    {author}")
+        print()
+
+
+references = []
 
 for entry in bib_database.entries:
+    ref = Reference()
+
+    ref.set_title(entry.get("title", None))
+
     raw_authors = entry.get("author", "")
     author_list = re.split(r"\s+and\s+", raw_authors, flags=re.IGNORECASE)
     author_list = [author.strip() for author in author_list]
-    parsed_data.append(
-        {"title": entry.get("title", "Unknown Title"), "authors": author_list}
-    )
+    author_list = [Author.parse(author) for author in author_list]
+    ref.set_authors(author_list)
 
-for item in parsed_data:
-    print(f"Title:\n    {item['title']}")
-    print(f"Authors:")
-    for author in item["authors"]:
-        print(f"    {author}")
-    print()
+    references.append(ref)
+
+for ref in references:
+    ref.log()

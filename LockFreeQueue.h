@@ -33,6 +33,7 @@ struct LockFreeQueue {
     alignas(CACHE_LINE) float data[CLF_QUEUE_SIZE];
 };
 
+// let the user choose the storage location
 void clfq_new(LockFreeQueue* clfq);
 
 // -------------------- Producer API --------------------

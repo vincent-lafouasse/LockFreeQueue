@@ -82,6 +82,9 @@ size_t clfq_pop_partial(LockFreeQueueConsumer* restrict consumer,
                         float* restrict elems,
                         size_t n);
 
+// peek operations will always return a smaller size than consumer_size() as it
+// has to guarantee a contiguous slice
+
 // Returns size of contiguous slice available using cached_back
 size_t clfq_consumer_peek_lazy(const LockFreeQueueConsumer* consumer,
                                const float** ptr);

@@ -26,6 +26,20 @@ static size_t distance(size_t front, size_t back)
     return (back - front) & (CLF_QUEUE_SIZE - 1);
 }
 
+size_t clfq_producer_size_lazy(const LockFreeQueueProducer* producer)
+{
+    const size_t back =
+        atomic_load_explicit(producer->back, memory_order_relaxed);
+    return distance(back, producer->cached_front + CLF_QUEUE_SIZE);
+}
+
+size_t clfq_producer_size_eager(LockFreeQueueProducer* producer)
+{
+    producer->cached_front =
+        atomic_load_explicit(producer->front, memory_order_acquire);
+    return clfq_producer_size_lazy(producer);
+}
+
 bool clfq_push(LockFreeQueueProducer* producer, const float* elems, size_t n)
 {
     // Producer is sole writer so there is no contention on `back`

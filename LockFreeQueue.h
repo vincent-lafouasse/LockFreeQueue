@@ -49,6 +49,13 @@ struct LockFreeQueueProducer {
 
 LockFreeQueueProducer clfq_producer(LockFreeQueue* clfq);
 
+// pessimistic estimate using cached `front`
+// there might be more available
+size_t clfq_producer_size_lazy(const LockFreeQueueProducer* producer);
+
+// loads `front and updates `cached_front`
+size_t clfq_producer_size_eager(LockFreeQueueProducer* producer);
+
 // no partial transactions
 bool clfq_push(LockFreeQueueProducer* producer, const float* elems, size_t n);
 // push as many as possible, return samples written

@@ -228,6 +228,20 @@ def format_month(month_input: str) -> str:
     return month_map.get(clean_input, month_input.capitalize())
 
 
+def full_doi(doi_str: str) -> str:
+    if not doi_str:
+        return ""
+
+    doi = doi_str.strip()
+
+    # Check if it's already a full link
+    if doi.startswith("http"):
+        return doi
+
+    # Standard IEEE/ACM/Springer resolver prefix
+    return f"https://doi.org/{doi}"
+
+
 def format_entry(entry) -> str:
     mnemonic = get_field(entry, "ID")
     etype = get_field(entry, "ENTRYTYPE").lower()
@@ -238,7 +252,15 @@ def format_entry(entry) -> str:
     archive = get_field(entry, "archive")
 
     header = f'[{mnemonic}] {authors.ieee()}, "{title},"'
-    link = Markdown.link(archive, "Archive")
+
+    archive_link = Markdown.link(archive, "Archive")
+    doi = entry.get("doi")
+    if doi:
+        doi_url = full_doi(doi)
+        doi_link = Markdown.link(doi_url, doi)
+        footer = f"{year}. DOI: {doi_link}. {archive_link}."
+    else:
+        footer = f"{year}. {archive_link}."
 
     if etype == "article":
         jrnl = Markdown.it(get_field(entry, "journal"))
@@ -264,7 +286,7 @@ def format_entry(entry) -> str:
     else:
         middle = " "
 
-    return f"{header}{middle}{year}. {link}."
+    return f"{header}{middle}{footer}"
 
 
 def main():

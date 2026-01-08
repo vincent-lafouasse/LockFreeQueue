@@ -2,3 +2,6 @@
 *.o
 *.gch
 build
+
+.idea
+idea-build

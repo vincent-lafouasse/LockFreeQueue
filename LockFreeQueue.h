@@ -1,6 +1,6 @@
 #pragma once
 
-// SPSC Lock-Free Queue (Wait-Free even)
+// Bounded SPSC Lock-Free Queue (Wait-Free even)
 //
 // Logic based on the WeakRB algorithm by Le et al. (2013),
 // which formalizes and optimizes the original concurrent

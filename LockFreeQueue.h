@@ -32,7 +32,8 @@ struct LockFreeQueue {
 
 typedef struct LockFreeQueueProducer LockFreeQueueProducer;
 struct LockFreeQueueProducer {
-    _Atomic size_t* back;
+    _Atomic size_t* back;         // sole writer
+    const _Atomic size_t* front;  // read only
     size_t* cached_front;
     float* data;
 };
@@ -42,6 +43,7 @@ LockFreeQueue clfq_new(void);
 LockFreeQueueProducer clfq_producer(LockFreeQueue* clfq)
 {
     return (LockFreeQueueProducer){.back = &clfq->back,
+                                   .front = &clfq->front,
                                    .cached_front = &clfq->cached_front,
                                    .data = clfq->data};
 }

@@ -59,9 +59,14 @@ class Author:
 
 
 class Reference:
-    def __init__(self):
-        self.title = None
-        self.authors = None
+    def __init__(self, entry):
+        self.set_title(entry.get("title", None))
+
+        raw_authors = entry.get("author", "")
+        author_list = re.split(r"\s+and\s+", raw_authors, flags=re.IGNORECASE)
+        author_list = [author.strip() for author in author_list]
+        author_list = [Author.parse(author) for author in author_list]
+        self.set_authors(author_list)
 
     def set_title(self, title):
         title = title.strip()
@@ -87,22 +92,9 @@ class Reference:
 
 def main():
     with open("references.bib") as bibtex_file:
-        bib_database = bibtexparser.load(bibtex_file)
+        library = bibtexparser.load(bibtex_file)
 
-    references = []
-
-    for entry in bib_database.entries:
-        ref = Reference()
-
-        ref.set_title(entry.get("title", None))
-
-        raw_authors = entry.get("author", "")
-        author_list = re.split(r"\s+and\s+", raw_authors, flags=re.IGNORECASE)
-        author_list = [author.strip() for author in author_list]
-        author_list = [Author.parse(author) for author in author_list]
-        ref.set_authors(author_list)
-
-        references.append(ref)
+    references = [Reference(entry) for entry in library.entries]
 
     for ref in references:
         ref.log()

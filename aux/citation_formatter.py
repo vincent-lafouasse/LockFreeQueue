@@ -61,12 +61,7 @@ class Author:
 class Reference:
     def __init__(self, entry):
         self.set_title(entry.get("title", None))
-
-        raw_authors = entry.get("author", "")
-        author_list = re.split(r"\s+and\s+", raw_authors, flags=re.IGNORECASE)
-        author_list = [author.strip() for author in author_list]
-        author_list = [Author.parse(author) for author in author_list]
-        self.set_authors(author_list)
+        self.authors = Reference.parse_authors(entry.get("author", ""))
 
     def set_title(self, title):
         title = title.strip()
@@ -74,8 +69,11 @@ class Reference:
             title += "."
         self.title = title
 
-    def set_authors(self, authors):
-        self.authors = authors
+    @staticmethod
+    def parse_authors(string):
+        author_list = re.split(r"\s+and\s+", string, flags=re.IGNORECASE)
+        author_list = [author.strip() for author in author_list]
+        return [Author.parse(author) for author in author_list]
 
     def format(self):
         authors = "; ".join(author.jacs() for author in self.authors)

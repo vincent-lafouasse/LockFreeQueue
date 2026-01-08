@@ -1,6 +1,30 @@
 import bibtexparser
 import re
 
+# required fields for _all_documents
+COMMON_REQUIRED = {
+    "author",
+    "title",
+    "year",
+    "archive",
+}
+
+# type-specific, e.g. journal for an article
+TYPE_SPECIFIC_REQUIRED = {
+    "article": {
+        "journal",
+        "volume",
+        "pages",
+        "doi",
+    },
+    "inproceedings": {
+        "booktitle",
+        "pages",
+        "doi",
+    },
+    "misc": set(),  # maybe howpublished later but for now, nothing
+}
+
 
 class Markdown:
     @staticmethod

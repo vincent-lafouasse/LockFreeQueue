@@ -10,6 +10,7 @@ COMMON_REQUIRED = {
 }
 
 # type-specific, e.g. journal for an article
+# mostly IEEE compliant (i skipped the location field for proceedings)
 TYPE_SPECIFIC_REQUIRED = {
     "article": {
         "journal",

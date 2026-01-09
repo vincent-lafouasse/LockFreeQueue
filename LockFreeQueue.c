@@ -63,6 +63,30 @@ bool clfq_push(LockFreeQueueProducer* restrict producer,
     return true;
 }
 
+static size_t min(size_t a, size_t b)
+{
+    return a < b ? a : b;
+}
+
+size_t clfq_push_partial(LockFreeQueueProducer* restrict producer,
+                         const float* restrict elems,
+                         size_t n,
+                         size_t frame_size)
+{
+    const size_t available = clfq_producer_size_eager(producer);
+    const size_t maximum_n = min(n, available);
+    const size_t actual_n = maximum_n - (maximum_n % frame_size);
+
+    if (actual_n == 0) {
+        return 0;
+    }
+
+    // will not trigger unnecessary loads as cached_front is fresh and big
+    // enough
+    const bool success = clfq_push(producer, elems, actual_n);
+    return success ? actual_n : 0;
+}
+
 // -------------------- Consumer API --------------------
 LockFreeQueueConsumer clfq_consumer(LockFreeQueue* clfq)
 {

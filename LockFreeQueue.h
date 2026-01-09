@@ -23,8 +23,16 @@
 // prevents false sharing on M-series CPU
 // harmless padding on 64B systems
 #define CACHE_LINE 128
-// 16KB
+
+#if !defined(CLF_QUEUE_SIZE)
+#if defined(CLFQ_BIG)
+#define CLF_QUEUE_SIZE 16384
+#elif defined(CLFQ_SMALL)
+#define CLF_QUEUE_SIZE 512
+#else
 #define CLF_QUEUE_SIZE 4096
+#endif
+#endif
 
 #define INVALID_QUEUE_SIZE_MSG                                      \
     "Concurrent lock free queue size must be a power of 2 in this " \

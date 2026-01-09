@@ -149,3 +149,31 @@ size_t clfq_pop_partial(LockFreeQueueConsumer* restrict consumer,
     const bool success = clfq_pop(consumer, elems, actual_n);
     return success ? actual_n : 0;
 }
+
+size_t clfq_consumer_peek_lazy(const LockFreeQueueConsumer* consumer,
+                               const float** ptr)
+{
+    const size_t available = clfq_consumer_size_lazy(consumer);
+    const size_t front =
+        atomic_load_explicit(consumer->front, memory_order_relaxed) &
+        (CLF_QUEUE_SIZE - 1);
+    const size_t until_buffer_end = CLF_QUEUE_SIZE - front;
+    const size_t actual_n = min(available, until_buffer_end);
+
+    if (actual_n == 0) {
+        *ptr = NULL;
+        return 0;
+    }
+
+    *ptr = consumer->data + front;
+    return actual_n;
+}
+
+// same but with a fresh cache
+size_t clfq_consumer_peek_eager(LockFreeQueueConsumer* consumer,
+                                const float** ptr)
+{
+    consumer->cached_back =
+        atomic_load_explicit(consumer->back, memory_order_acquire);
+    return clfq_consumer_peek_lazy(consumer, ptr);
+}

@@ -10,7 +10,7 @@ void clfq_new(LockFreeQueue* clfq)
 }
 
 // -------------------- Producer API --------------------
-LockFreeQueueProducer clfq_producer(LockFreeQueue* clfq)
+LockFreeQueueProducer clfq_producer(LockFreeQueue* restrict clfq)
 {
     return (LockFreeQueueProducer){.back = &clfq->back,
                                    .front = &clfq->front,
@@ -25,14 +25,14 @@ static size_t distance(size_t front, size_t back)
     return (back - front) & (CLF_QUEUE_SIZE - 1);
 }
 
-size_t clfq_producer_size_lazy(const LockFreeQueueProducer* producer)
+size_t clfq_producer_size_lazy(const LockFreeQueueProducer* restrict producer)
 {
     const size_t back =
         atomic_load_explicit(producer->back, memory_order_relaxed);
     return distance(back, producer->cached_front + CLF_QUEUE_SIZE);
 }
 
-size_t clfq_producer_size_eager(LockFreeQueueProducer* producer)
+size_t clfq_producer_size_eager(LockFreeQueueProducer* restrict producer)
 {
     producer->cached_front =
         atomic_load_explicit(producer->front, memory_order_acquire);
@@ -88,7 +88,7 @@ size_t clfq_push_partial(LockFreeQueueProducer* restrict producer,
 }
 
 // -------------------- Consumer API --------------------
-LockFreeQueueConsumer clfq_consumer(LockFreeQueue* clfq)
+LockFreeQueueConsumer clfq_consumer(LockFreeQueue* restrict clfq)
 {
     return (LockFreeQueueConsumer){
         .front = &clfq->front,
@@ -98,7 +98,7 @@ LockFreeQueueConsumer clfq_consumer(LockFreeQueue* clfq)
     };
 }
 
-size_t clfq_consumer_size_lazy(const LockFreeQueueConsumer* consumer)
+size_t clfq_consumer_size_lazy(const LockFreeQueueConsumer* restrict consumer)
 {
     const size_t front =
         atomic_load_explicit(consumer->front, memory_order_relaxed);
@@ -106,7 +106,7 @@ size_t clfq_consumer_size_lazy(const LockFreeQueueConsumer* consumer)
     return distance(front, consumer->cached_back);
 }
 
-size_t clfq_consumer_size_eager(LockFreeQueueConsumer* consumer)
+size_t clfq_consumer_size_eager(LockFreeQueueConsumer* restrict consumer)
 {
     consumer->cached_back =
         atomic_load_explicit(consumer->back, memory_order_acquire);
@@ -150,8 +150,8 @@ size_t clfq_pop_partial(LockFreeQueueConsumer* restrict consumer,
     return success ? actual_n : 0;
 }
 
-size_t clfq_consumer_peek_lazy(const LockFreeQueueConsumer* consumer,
-                               const float** ptr)
+size_t clfq_consumer_peek_lazy(const LockFreeQueueConsumer* restrict consumer,
+                               const float** restrict ptr)
 {
     const size_t available = clfq_consumer_size_lazy(consumer);
     const size_t front =
@@ -170,8 +170,8 @@ size_t clfq_consumer_peek_lazy(const LockFreeQueueConsumer* consumer,
 }
 
 // same but with a fresh cache
-size_t clfq_consumer_peek_eager(LockFreeQueueConsumer* consumer,
-                                const float** ptr)
+size_t clfq_consumer_peek_eager(LockFreeQueueConsumer* restrict consumer,
+                                const float** restrict ptr)
 {
     consumer->cached_back =
         atomic_load_explicit(consumer->back, memory_order_acquire);
@@ -179,7 +179,7 @@ size_t clfq_consumer_peek_eager(LockFreeQueueConsumer* consumer,
 }
 
 // no checks, good luck
-void clfq_consumer_skip(LockFreeQueueConsumer* consumer, size_t n)
+void clfq_consumer_skip(LockFreeQueueConsumer* restrict consumer, size_t n)
 {
     const size_t front =
         atomic_load_explicit(consumer->front, memory_order_relaxed);

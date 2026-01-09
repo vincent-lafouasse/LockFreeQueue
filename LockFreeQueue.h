@@ -57,14 +57,14 @@ struct LockFreeQueueProducer {
     float* data;
 };
 
-LockFreeQueueProducer clfq_producer(LockFreeQueue* clfq);
+LockFreeQueueProducer clfq_producer(LockFreeQueue* restrict clfq);
 
 // pessimistic estimate using cached `front`. no atomic load at all
 // there might be more available
-size_t clfq_producer_size_lazy(const LockFreeQueueProducer* producer);
+size_t clfq_producer_size_lazy(const LockFreeQueueProducer* restrict producer);
 
 // loads `front` with `acquire` ordering and updates `cached_front`
-size_t clfq_producer_size_eager(LockFreeQueueProducer* producer);
+size_t clfq_producer_size_eager(LockFreeQueueProducer* restrict producer);
 
 // push operations sometimes `acquire` load `front` when the pessimistic lazy
 // size is not enough
@@ -92,10 +92,10 @@ struct LockFreeQueueConsumer {
     const float* data;
 };
 
-LockFreeQueueConsumer clfq_consumer(LockFreeQueue* clfq);
+LockFreeQueueConsumer clfq_consumer(LockFreeQueue* restrict clfq);
 
-size_t clfq_consumer_size_lazy(const LockFreeQueueConsumer* consumer);
-size_t clfq_consumer_size_eager(LockFreeQueueConsumer* consumer);
+size_t clfq_consumer_size_lazy(const LockFreeQueueConsumer* restrict consumer);
+size_t clfq_consumer_size_eager(LockFreeQueueConsumer* restrict consumer);
 
 bool clfq_pop(LockFreeQueueConsumer* restrict consumer,
               float* restrict elems,
@@ -115,15 +115,15 @@ size_t clfq_pop_partial(LockFreeQueueConsumer* restrict consumer,
 
 // Returns size of contiguous slice available using cached_back
 // no load is performed
-size_t clfq_consumer_peek_lazy(const LockFreeQueueConsumer* consumer,
-                               const float** ptr);
+size_t clfq_consumer_peek_lazy(const LockFreeQueueConsumer* restrict consumer,
+                               const float** restrict ptr);
 
 // Updates cached_back then returns contiguous slice size.
 // `back` is loaded with `acquire` ordering
-size_t clfq_consumer_peek_eager(LockFreeQueueConsumer* consumer,
-                                const float** ptr);
+size_t clfq_consumer_peek_eager(LockFreeQueueConsumer* restrict consumer,
+                                const float** restrict ptr);
 
 // unsafe, will cross the write end if not careful
 // meant to be called after peek to consume data that we know is there
 // the new read end is published with `release` ordering
-void clfq_consumer_skip(LockFreeQueueConsumer* consumer, size_t n);
+void clfq_consumer_skip(LockFreeQueueConsumer* restrict consumer, size_t n);

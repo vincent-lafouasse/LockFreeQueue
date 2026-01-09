@@ -2,12 +2,14 @@
 
 #include <stdatomic.h>
 
+// -------------------- Shared storage --------------------
 void clfq_new(LockFreeQueue* clfq)
 {
     atomic_init(&clfq->front, 0);
     atomic_init(&clfq->back, 0);
 }
 
+// -------------------- Producer API --------------------
 LockFreeQueueProducer clfq_producer(LockFreeQueue* clfq)
 {
     return (LockFreeQueueProducer){.back = &clfq->back,
@@ -61,6 +63,7 @@ bool clfq_push(LockFreeQueueProducer* restrict producer,
     return true;
 }
 
+// -------------------- Consumer API --------------------
 LockFreeQueueConsumer clfq_consumer(LockFreeQueue* clfq)
 {
     return (LockFreeQueueConsumer){

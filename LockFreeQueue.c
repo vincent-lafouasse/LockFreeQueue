@@ -132,3 +132,20 @@ bool clfq_pop(LockFreeQueueConsumer* restrict consumer,
     atomic_store_explicit(consumer->front, front + n, memory_order_release);
     return true;
 }
+
+size_t clfq_pop_partial(LockFreeQueueConsumer* restrict consumer,
+                        float* restrict elems,
+                        size_t n,
+                        size_t frame_size)
+{
+    const size_t available = clfq_consumer_size_eager(consumer);
+    const size_t maximum_n = min(n, available);
+    const size_t actual_n = maximum_n - (maximum_n % frame_size);
+
+    if (actual_n == 0) {
+        return 0;
+    }
+
+    const bool success = clfq_pop(consumer, elems, actual_n);
+    return success ? actual_n : 0;
+}

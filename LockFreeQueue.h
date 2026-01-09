@@ -75,9 +75,12 @@ bool clfq_push(LockFreeQueueProducer* restrict producer,
                const float* restrict elems,
                size_t n);
 // push as many as possible, return samples written
+// will only commit a multiple of frame_size as not to tear frames
+// e.g. to preserve interleaved LR stereo frames, pass frame_size=2
 size_t clfq_push_partial(LockFreeQueueProducer* restrict producer,
                          const float* restrict elems,
-                         size_t n);
+                         size_t n,
+                         size_t frame_size);
 
 // -------------------- Consumer API --------------------
 // the API (and implementation) is pretty much symmetric, see Producer for info
@@ -99,7 +102,8 @@ bool clfq_pop(LockFreeQueueConsumer* restrict consumer,
               size_t n);
 size_t clfq_pop_partial(LockFreeQueueConsumer* restrict consumer,
                         float* restrict elems,
-                        size_t n);
+                        size_t n,
+                        size_t frame_size);
 
 // peek returns a pointer to a contiguous slice of unread elements.
 // The returned pointer remains valid until the next call that advances the

@@ -177,3 +177,11 @@ size_t clfq_consumer_peek_eager(LockFreeQueueConsumer* consumer,
         atomic_load_explicit(consumer->back, memory_order_acquire);
     return clfq_consumer_peek_lazy(consumer, ptr);
 }
+
+// no checks, good luck
+void clfq_consumer_skip(LockFreeQueueConsumer* consumer, size_t n)
+{
+    const size_t front =
+        atomic_load_explicit(consumer->front, memory_order_relaxed);
+    atomic_store_explicit(consumer->front, front + n, memory_order_release);
+}

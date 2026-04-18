@@ -9,6 +9,8 @@ consumers must provide CLF_QUEUE_SIZE one of two ways:
 2. downstream CML.txt:    `set(CLF_QUEUE_SIZE 8192 CACHE STRING "" FORCE)`
     - (FORCE required to override any cached value)
 
+the absence of a default value is intentional. you MUST provide a size
+
 ## References
 
 - \[Swartz2008\] A. Swartz, "Guerilla Open Access Manifesto," 2008. [Archive](https://archive.org/details/GuerillaOpenAccessManifesto).

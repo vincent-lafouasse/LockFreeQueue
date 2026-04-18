@@ -21,7 +21,8 @@
 #include <stddef.h>
 
 // check that a size was i) supplied and ii) suitable
-// also check that there is a suitable size type and define it
+// also checks that atomic(u32) is always lock-free
+// this allows us to use u32 everywhere
 #include "LockFreeQueue_check.h"
 
 // prevents false sharing on M-series CPU
@@ -32,11 +33,11 @@
 typedef struct LockFreeQueue LockFreeQueue;
 struct LockFreeQueue {
     // avoid false sharing
-    alignas(CACHE_LINE) _Atomic(size_t) front;
-    char pad1[CACHE_LINE - sizeof(_Atomic(size_t))];
+    alignas(CACHE_LINE) _Atomic(uint32_t) front;
+    char pad1[CACHE_LINE - sizeof(_Atomic(uint32_t))];
 
-    alignas(CACHE_LINE) _Atomic(size_t) back;
-    char pad2[CACHE_LINE - sizeof(_Atomic(size_t))];
+    alignas(CACHE_LINE) _Atomic(uint32_t) back;
+    char pad2[CACHE_LINE - sizeof(_Atomic(uint32_t))];
 
     alignas(CACHE_LINE) float data[CLF_QUEUE_SIZE];
 };
@@ -47,9 +48,9 @@ void clfq_new(LockFreeQueue* clfq);
 // -------------------- Producer API --------------------
 typedef struct LockFreeQueueProducer LockFreeQueueProducer;
 struct LockFreeQueueProducer {
-    _Atomic(size_t)* back;         // sole writer
-    const _Atomic(size_t)* front;  // read only
-    size_t cached_front;           // avoid pessimistic loads
+    _Atomic(uint32_t)* back;         // sole writer
+    const _Atomic(uint32_t)* front;  // read only
+    uint32_t cached_front;           // avoid pessimistic loads
     float* data;
 };
 
@@ -57,10 +58,11 @@ LockFreeQueueProducer clfq_producer(LockFreeQueue* restrict clfq);
 
 // pessimistic estimate using cached `front`. no atomic load at all
 // there might be more available
-size_t clfq_producer_size_lazy(const LockFreeQueueProducer* restrict producer);
+uint32_t clfq_producer_size_lazy(
+    const LockFreeQueueProducer* restrict producer);
 
 // loads `front` with `acquire` ordering and updates `cached_front`
-size_t clfq_producer_size_eager(LockFreeQueueProducer* restrict producer);
+uint32_t clfq_producer_size_eager(LockFreeQueueProducer* restrict producer);
 
 // push operations sometimes `acquire` load `front` when the pessimistic lazy
 // size is not enough
@@ -69,37 +71,38 @@ size_t clfq_producer_size_eager(LockFreeQueueProducer* restrict producer);
 // no partial transactions
 bool clfq_push(LockFreeQueueProducer* restrict producer,
                const float* restrict elems,
-               size_t n);
+               uint32_t n);
 // push as many as possible, return samples written
 // will only commit a multiple of frame_size as not to tear frames
 // e.g. to preserve interleaved LR stereo frames, pass frame_size=2
-size_t clfq_push_partial(LockFreeQueueProducer* restrict producer,
-                         const float* restrict elems,
-                         size_t n,
-                         size_t frame_size);
+uint32_t clfq_push_partial(LockFreeQueueProducer* restrict producer,
+                           const float* restrict elems,
+                           uint32_t n,
+                           uint32_t frame_size);
 
 // -------------------- Consumer API --------------------
 // the API (and implementation) is pretty much symmetric, see Producer for info
 typedef struct LockFreeQueueConsumer LockFreeQueueConsumer;
 struct LockFreeQueueConsumer {
-    _Atomic(size_t)* front;
-    const _Atomic(size_t)* back;
-    size_t cached_back;
+    _Atomic(uint32_t)* front;
+    const _Atomic(uint32_t)* back;
+    uint32_t cached_back;
     const float* data;
 };
 
 LockFreeQueueConsumer clfq_consumer(LockFreeQueue* restrict clfq);
 
-size_t clfq_consumer_size_lazy(const LockFreeQueueConsumer* restrict consumer);
-size_t clfq_consumer_size_eager(LockFreeQueueConsumer* restrict consumer);
+uint32_t clfq_consumer_size_lazy(
+    const LockFreeQueueConsumer* restrict consumer);
+uint32_t clfq_consumer_size_eager(LockFreeQueueConsumer* restrict consumer);
 
 bool clfq_pop(LockFreeQueueConsumer* restrict consumer,
               float* restrict elems,
-              size_t n);
-size_t clfq_pop_partial(LockFreeQueueConsumer* restrict consumer,
-                        float* restrict elems,
-                        size_t n,
-                        size_t frame_size);
+              uint32_t n);
+uint32_t clfq_pop_partial(LockFreeQueueConsumer* restrict consumer,
+                          float* restrict elems,
+                          uint32_t n,
+                          uint32_t frame_size);
 
 // peek returns a pointer to a contiguous slice of unread elements.
 // The returned pointer remains valid until the next call that advances the
@@ -111,15 +114,15 @@ size_t clfq_pop_partial(LockFreeQueueConsumer* restrict consumer,
 
 // Returns size of contiguous slice available using cached_back
 // no load is performed
-size_t clfq_consumer_peek_lazy(const LockFreeQueueConsumer* restrict consumer,
-                               const float** restrict ptr);
+uint32_t clfq_consumer_peek_lazy(const LockFreeQueueConsumer* restrict consumer,
+                                 const float** restrict ptr);
 
 // Updates cached_back then returns contiguous slice size.
 // `back` is loaded with `acquire` ordering
-size_t clfq_consumer_peek_eager(LockFreeQueueConsumer* restrict consumer,
-                                const float** restrict ptr);
+uint32_t clfq_consumer_peek_eager(LockFreeQueueConsumer* restrict consumer,
+                                  const float** restrict ptr);
 
 // unsafe, will cross the write end if not careful
 // meant to be called after peek to consume data that we know is there
 // the new read end is published with `release` ordering
-void clfq_consumer_skip(LockFreeQueueConsumer* restrict consumer, size_t n);
+void clfq_consumer_skip(LockFreeQueueConsumer* restrict consumer, uint32_t n);

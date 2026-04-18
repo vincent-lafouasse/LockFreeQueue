@@ -20,18 +20,10 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-// prevents false sharing on M-series CPU
-// harmless padding on 64B systems
-#define CACHE_LINE 128
+#include "LockFreeQueue_conf.h"
 
 #if !defined(CLF_QUEUE_SIZE)
-#if defined(CLFQ_BIG)
-#define CLF_QUEUE_SIZE 16384
-#elif defined(CLFQ_SMALL)
-#define CLF_QUEUE_SIZE 512
-#else
-#define CLF_QUEUE_SIZE 4096
-#endif
+#error "lockfreequeue_config.h must define LFQ_CAPACITY"
 #endif
 
 #define INVALID_QUEUE_SIZE_MSG                                      \
@@ -39,6 +31,10 @@
     "implementation"
 _Static_assert(((CLF_QUEUE_SIZE & (CLF_QUEUE_SIZE - 1)) == 0),
                INVALID_QUEUE_SIZE_MSG);
+
+// prevents false sharing on M-series CPU
+// harmless padding on 64B systems
+#define CACHE_LINE 128
 
 // -------------------- Shared storage --------------------
 typedef struct LockFreeQueue LockFreeQueue;

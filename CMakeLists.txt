@@ -15,25 +15,3 @@ target_include_directories(${PROJECT_NAME} PUBLIC .)
 
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic
                                                -fdiagnostics-color=always)
-
-# size presets
-# BIG overrides SMALL if both a present
-option(CLFQ_BIG "Use 16k sample buffer" OFF)
-option(CLFQ_SMALL "Use 512 sample buffer" OFF)
-
-if(CLFQ_BIG)
-	target_compile_definitions(${PROJECT_NAME} PUBLIC CLFQ_BIG)
-elseif(CLFQ_SMALL)
-	target_compile_definitions(${PROJECT_NAME} PUBLIC CLFQ_SMALL)
-endif()
-
-# this overrides the BIG/SMALL options
-# either pass -DCLF_QUEUE_SIZE=8192 from the command line
-# or use the following line in the downstream CML.txt with the FORCE flag
-set(CLF_QUEUE_SIZE "" CACHE STRING "Manual override for queue size (must be power of 2)")
-if(CLF_QUEUE_SIZE)
-    target_compile_definitions(${PROJECT_NAME} PUBLIC CLF_QUEUE_SIZE=${CLF_QUEUE_SIZE})
-endif()
-
-# if no size was chosen at all, the default size of 4096 samples, ie 16KB, is
-# chosen

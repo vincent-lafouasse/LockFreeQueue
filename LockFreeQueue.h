@@ -21,6 +21,7 @@
 #include <stddef.h>
 
 // check that a size was i) supplied and ii) suitable
+// also check that there is a suitable size type and define it
 #include "LockFreeQueue_check.h"
 
 // prevents false sharing on M-series CPU

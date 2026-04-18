@@ -15,3 +15,11 @@ target_include_directories(${PROJECT_NAME} PUBLIC .)
 
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic
                                                -fdiagnostics-color=always)
+
+# this is a sentinel value, hence why we do not use FORCE here
+set(CLF_QUEUE_SIZE 0 CACHE STRING "Queue size override (must be power of 2)")
+if(CLF_QUEUE_SIZE EQUAL 0)
+    message(FATAL_ERROR "CLF_QUEUE_SIZE must be set")
+endif()
+
+target_compile_definitions(${PROJECT_NAME} PUBLIC CLF_QUEUE_SIZE=${CLF_QUEUE_SIZE})

@@ -1,9 +1,7 @@
 #pragma once
 
-#include "LockFreeQueue_conf.h"
-
 #if !defined(CLF_QUEUE_SIZE)
-#error "lockfreequeue_config.h must define LFQ_CAPACITY"
+#error "build system must provide a queue size"
 #endif
 
 #define INVALID_QUEUE_SIZE_MSG                                      \

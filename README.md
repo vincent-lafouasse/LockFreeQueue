@@ -2,6 +2,10 @@
 
 A review on wait-free data structures
 
+## size configuration
+
+edit `LockFreeQueue_conf.h` to set the queue size. otherwise the reasonable size of 4096 is chosen as default
+
 ## References
 
 - \[Swartz2008\] A. Swartz, "Guerilla Open Access Manifesto," 2008. [Archive](https://archive.org/details/GuerillaOpenAccessManifesto).

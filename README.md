@@ -2,9 +2,9 @@
 
 A review on wait-free data structures
 
-## size configuration
+## configuration
 
-consumers must provide CLF_QUEUE_SIZE one of two ways:
+you must provide CLF_QUEUE_SIZE one of two ways:
 1. command line:          `cmake -DCLF_QUEUE_SIZE=8192 [...]`
 2. downstream CML.txt:    `set(CLF_QUEUE_SIZE 8192 CACHE STRING "" FORCE)`
     - (FORCE required to override any cached value)

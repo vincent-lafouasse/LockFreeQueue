@@ -1,6 +1,7 @@
 #include "LockFreeQueue.h"
 
 #include <stdatomic.h>
+#include <stddef.h>
 
 // -------------------- Shared storage --------------------
 void clfq_new(LockFreeQueue* clfq)

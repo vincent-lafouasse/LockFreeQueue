@@ -18,7 +18,7 @@
 
 #include <stdalign.h>
 #include <stdbool.h>
-#include <stddef.h>
+#include <stdint.h>
 
 // check that a size was i) supplied and ii) suitable
 // also checks that atomic(u32) is always lock-free
